@@ -77,6 +77,7 @@ export default class ChessBoard extends Component {
 
     componentDidMount() {
       //this.reset()
+     console.log("Mounted board!") 
     }
 
     flip = () => {
@@ -89,7 +90,23 @@ export default class ChessBoard extends Component {
           let newPos = [...this.state.positions[this.state.currentPosition]]
           newPos[sqFrom] = '0'
           newPos[sqTo] = figure
-          this.state.positions.push(newPos.join(''))
+          if (figure === 'k' && sqFrom === 4 && sqTo === 2) {
+              newPos[0] = '0'
+              newPos[3] = 'r'
+          }
+          if (figure === 'k' && sqFrom === 4 && sqTo === 6) {
+            newPos[7] = '0'
+            newPos[5] = 'r'
+        }
+        if (figure === 'K' && sqFrom === 60 && sqTo === 58) {
+            newPos[56] = '0'
+            newPos[59] = 'R'
+        }
+        if (figure === 'K' && sqFrom === 60 && sqTo === 62) {
+          newPos[63] = '0'
+          newPos[61] = 'R'
+      }
+      this.state.positions.push(newPos.join(''))
           this.setState({currentPosition: this.state.currentPosition + 1})
       }
     }
@@ -127,6 +144,14 @@ export default class ChessBoard extends Component {
     onDrop = (sq, sqIndex, evt) => {
       evt.preventDefault()
       console.log(`onDrop(sq=${sq}, sqIndex=${sqIndex})`)
+      if (sqIndex === this.sqFrom) {
+          this.sqFrom = -1
+          this.figureFrom = ''
+          return
+      }
+      this.move(this.sqFrom, sqIndex, this.figureFrom)
+      this.sqFrom = -1
+      this.figureFrom = ''
     }
 
     render() {
@@ -153,6 +178,7 @@ export default class ChessBoard extends Component {
                           style={{
                             width: "100%",
                             height: "100%",
+                            cursor: "pointer"
                           }}
                           onDragStart={evt => this.onDragStart(sqIndex, dataIndex, figure, evt)}
                           onDragEnd={f => f}
