@@ -71,12 +71,12 @@ export default class ChessBoard extends Component {
     }
 
     reset = () => {
-      this.setState({positions: this.props.positions || defaultSettings.positions,
+      this.setState({positions: this.state.positions.splice(0, 1),
                      currentPosition: this.props.currentPosition || defaultSettings.currentPosition})
     }
 
     componentDidMount() {
-      this.reset()
+      //this.reset()
     }
 
     flip = () => {
@@ -84,7 +84,7 @@ export default class ChessBoard extends Component {
     } 
 
     move = (sqFrom, sqTo, figure) => {
-      console.log(`move(sqFrom=${sqFrom}, sqTo=${sqTo}, figure=${figure}}`)
+      console.log(`move(sqFrom=${sq2pgn(sqFrom ^ 56)}, sqTo=${sq2pgn(sqTo ^ 56)}, figure=${figure}}`)
       if (!this.moveValidator) {
           let newPos = [...this.state.positions[this.state.currentPosition]]
           newPos[sqFrom] = '0'
@@ -118,9 +118,15 @@ export default class ChessBoard extends Component {
       }
     }
 
+    onDragStart = (sq, sqIndex, figure, evt) => {
+      console.log(`Drag started at sq ${sq2pgn(sq)} with figure ${figure}`)
+      this.sqFrom = sqIndex
+      this.figureFrom = figure
+    }
+
     onDrop = (sq, sqIndex, evt) => {
       evt.preventDefault()
-      console.log(`onDrop(sq=${sq}, sqIndex=${sqIndex}`)
+      console.log(`onDrop(sq=${sq}, sqIndex=${sqIndex})`)
     }
 
     render() {
@@ -148,7 +154,7 @@ export default class ChessBoard extends Component {
                             width: "100%",
                             height: "100%",
                           }}
-                          onDragStart={f => f}
+                          onDragStart={evt => this.onDragStart(sqIndex, dataIndex, figure, evt)}
                           onDragEnd={f => f}
                         /> 
                     )
@@ -156,6 +162,7 @@ export default class ChessBoard extends Component {
                   return (
                     <div key={sqIndex}
                          onClick={(evt) => this.onClick(sqIndex, dataIndex, figure, evt)}
+                         onDragOver={(evt) => {evt.preventDefault()}}
                          onDrop={(evt) => this.onDrop(sqIndex, dataIndex, evt)} 
                          style={{display: 'inline-block', 
                                  border: 'none',

@@ -17,6 +17,7 @@ export default () => {
       </div>
       <div className="row">
         <button onClick={() => board1.flip()}>Flip</button>
+        <button onClick={() => board1.reset()}>Restart Game</button>
       </div>
     </div>
 
