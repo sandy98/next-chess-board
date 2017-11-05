@@ -10,14 +10,21 @@ export default () => {
   <div>
     <Head title="Home" />
     <Nav>
-        <div className="hero">
-        <div className="row">
-            <ChessBoard id={v4()} size={480} ref={(b1) => board1 = b1}/>
-        </div>
-        <div className="row">
-            <button onClick={() => board1.flip()}>Flip</button>
-            <button onClick={() => board1.reset()}>Restart Game</button>
-        </div>
+        <div className="hero" style={{backgroundImage: 'url("static/img/monstruos.jpg")',
+                                      backgoundSize: '800px 600px',
+                                      backgroundPosition: 'center',
+                                      marginLeft: '7%',
+                                      marginRight: '10%',
+                                      width: '80%', 
+                                      padding: '2em',
+                                      borderRadius: '15px'}}>
+            <div className="row">
+                <ChessBoard id={v4()} size={480} ref={(b1) => board1 = b1}/>
+            </div>
+            <div className="row">
+                <button onClick={() => board1.flip()}>Flip</button>
+                <button onClick={() => board1.reset()}>Restart Game</button>
+            </div>
         </div>
     </Nav>
   </div>

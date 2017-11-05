@@ -40,7 +40,7 @@ const isSameRow = (sq1, sq2) => difRow(sq1, sq2) === 0
 const isDiagonal = (sq1, sq2) => (sq1 != sq2) && (difRow(sq1, sq2) === difCol(sq1, sq2))
 const isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
 const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((row(sq) % 2 === 1) && (col(sq) % 2 === 1))
-const sq2pgn = (sq) => `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}`
+const sq2pgn = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
 
 const letter2img = {p: 'p.png', P: 'pw.png', 
                      n: 'n.png', N: 'nw.png', 
@@ -63,7 +63,8 @@ export default class ChessBoard extends Component {
         currentPosition: this.props.currentPosition || defaultSettings.currentPosition,
         positions: this.props.positions || defaultSettings.positions,
         lightSqsBg: this.props.lightSqsBg || defaultSettings.lightSqsBg,
-        darkSqsBg: this.props.darkSqBgs || defaultSettings.darkSqsBg
+        darkSqsBg: this.props.darkSqBgs || defaultSettings.darkSqsBg,
+        selectedSq: -1
       }
       this.sqFrom = -1
       this.figureFrom = ''
@@ -139,17 +140,21 @@ export default class ChessBoard extends Component {
         else {
           this.sqFrom = sqIndex
           this.figureFrom = figure
+          this.setState({selectedSq: sq})
+          console.log(`Selected square class name: ${this.refs[sq2pgn(sq)].className}`)
         }
       }
       else {
         if (this.sqFrom === sqIndex) {
           this.sqFrom = -1
           this.figureFrom = ''
+          this.setState({selectedSq: -1})
         }
         else {
           this.move(this.sqFrom, sqIndex, this.figureFrom)
           this.sqFrom = -1
           this.figureFrom = ''
+          this.setState({selectedSq: -1})
         }
       }
     }
@@ -158,6 +163,7 @@ export default class ChessBoard extends Component {
       console.log(`Drag started at sq ${sq2pgn(sq)} with figure ${figure}`)
       this.sqFrom = sqIndex
       this.figureFrom = figure
+      this.setState({selectedSq: sq})
     }
 
     onDrop = (sq, sqIndex, evt) => {
@@ -166,15 +172,18 @@ export default class ChessBoard extends Component {
       if (sqIndex === this.sqFrom) {
           this.sqFrom = -1
           this.figureFrom = ''
+          this.setState({selectedSq: -1})
           return
       }
       this.move(this.sqFrom, sqIndex, this.figureFrom)
       this.sqFrom = -1
       this.figureFrom = ''
+      this.setState({selectedSq: -1})
     }
 
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
+      console.log(`Selected square = ${sq2pgn(this.state.selectedSq)}`)
       let chosenRows = this.state.flipped ? flippedRows : unflippedRows
       let rows = chosenRows.map((row, nrow) => {
           let rowIndex = this.state.flipped ? nrow : 7 - nrow
@@ -209,15 +218,16 @@ export default class ChessBoard extends Component {
                          onClick={(evt) => this.onClick(sqIndex, dataIndex, figure, evt)}
                          onDragOver={(evt) => {evt.preventDefault()}}
                          onDrop={(evt) => this.onDrop(sqIndex, dataIndex, evt)} 
+                         className={sqIndex === this.state.selectedSq ? 'selectedSq' : 'unselectedSq'}
                          style={{display: 'inline-block', 
-                                 border: 'none',
                                  width: `${this.state.size / 8}px`,
                                  height: `${this.state.size / 8}px`,
                                  backgroundColor: isBlackSquare(sqIndex) ? this.state.darkSqsBg : this.state.lightSqsBg}}
                          datasquare={sqIndex}
-                         datapgn={sq2pgn(sqIndex)}
+                         ref={sq2pgn(sqIndex)}
                          dataindex={dataIndex}
-                         title={`sqI: ${sqIndex} I: ${dataIndex} Sq: ${sq2pgn(sqIndex)}`}  
+                         title={sq2pgn(sqIndex)}
+                         hiddendata={`sqI: ${sqIndex} I: ${dataIndex} Sq: ${sq2pgn(sqIndex)}`}  
                     >
                       {content}  
                     </div>
@@ -233,10 +243,15 @@ export default class ChessBoard extends Component {
           style={{
             width: `${this.state.size}px`,
             height: `${this.state.size}px`,
-            border: 'solid 1px black'
+            border: 'solid 1px navy'
           }}
         >
           {rows}
+          <style jsx>{`
+            .selectedSq {
+              background: lightcoral;    
+            }
+          `}</style>
         </div>
       )
     }

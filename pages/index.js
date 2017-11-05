@@ -30,7 +30,8 @@ export default class Index extends Component {
                                        padding: '1em', 
                                        background: '#efefef',
                                        border: 'solid 1px navy',
-                                       borderRadius: '10px'}}>
+                                       borderRadius: '10px',
+                                       }}>
             <ReactMarkdown source={this.props.readme} />
           </div>
         </div>

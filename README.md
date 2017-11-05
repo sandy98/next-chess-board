@@ -1,10 +1,9 @@
 # React Chess Board
 
-## Table of Contents
+Yet another Javascript chessboard.
 
-- [Install](#install)
-- [Usage](#usage)
-- [Technology](#technology)
+Intended to be used as a pluggable component in projects constructed using [React.js](https://reactjs.org/)
+ and involving chess games.
 
 
 ## Install
@@ -37,8 +36,10 @@ or
 ```
 
 If everything works ok, now you are able to use it.
-  The main component lives in `components/board.js`
-  You can take this file and put it wherever you see fit in your proyect, then, for instance in your `index.js`:
+
+The main component lives in `components/board.js
+  `
+You can take this file and put it wherever you see fit in your proyect, then, for instance in your `index.js`:
   
     import ChessBoard from 'whereyouputit\board'
     
@@ -46,6 +47,7 @@ If everything works ok, now you are able to use it.
       <div>
         <Chessboard />
       </div>
+    )
 
 ## Usage
 
