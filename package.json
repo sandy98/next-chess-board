@@ -1,5 +1,5 @@
 {
-  "version": "0.01",
+  "version": "0.1.0",
   "name": "next-chess-board",
   "scripts": {
     "dev": "next",
