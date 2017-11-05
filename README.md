@@ -2,12 +2,15 @@
 
 ## Table of Contents
 
-- [Questions? Feedback?](#questions-feedback)
-- [Folder Structure](#folder-structure)
-- [Available Scripts](#available-scripts)
-  - [npm run dev](#npm-run-dev)
-  - [npm run build](#npm-run-build)
-  - [npm run start](#npm-run-start)
+- [Install](#install)
+- [Technology](#technology)
+
+
+## Install
+  
+
+
+## Technology
 
 This project was bootstrapped with [Create Next App](https://github.com/segmentio/create-next-app).
 
