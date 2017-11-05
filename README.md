@@ -52,6 +52,8 @@ If everything works ok, now you are able to use it.
 Fine tuning of the component.
 Yet to be written.
 
+There are a lot of details worth mentioning, so this is a work in progress.
+
 ## Technology
 
 This project was bootstrapped with [Create Next App](https://github.com/segmentio/create-next-app).
