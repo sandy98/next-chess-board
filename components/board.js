@@ -84,8 +84,27 @@ export default class ChessBoard extends Component {
       this.setState({flipped: !this.state.flipped})
     } 
 
-    move = (sqFrom, sqTo, figure) => {
+    getCrowning = (fig) => {
+        let crowned 
+        while (!crowned) {
+          crowned = prompt("Choose promotion(Q, R, N, B)", "Q")
+        }
+        if (fig === 'p') {
+            return crowned.toLowerCase()
+        }
+        else {
+            return crowned.toUpperCase()
+        }
+    }
+
+    move = async (sqFrom, sqTo, figure, crowning) => {
       console.log(`move(sqFrom=${sq2pgn(sqFrom ^ 56)}, sqTo=${sq2pgn(sqTo ^ 56)}, figure=${figure}}`)
+      if (crowning) {
+        figure = crowning
+      }
+      else if ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7)) {
+          figure = await this.getCrowning(figure)
+      }
       if (!this.moveValidator) {
           let newPos = [...this.state.positions[this.state.currentPosition]]
           newPos[sqFrom] = '0'
@@ -218,10 +237,6 @@ export default class ChessBoard extends Component {
           }}
         >
           {rows}
-            <style jsx>{`
-            
-            `}
-            </style>
         </div>
       )
     }

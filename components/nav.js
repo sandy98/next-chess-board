@@ -9,7 +9,8 @@ const links = [
   return link
 })
 
-const Nav = () => (
+const Nav = (props) => (
+  <div>
   <nav>
     <ul>
       <li>
@@ -30,7 +31,7 @@ const Nav = () => (
       </ul>
     </ul>
 
-    <style jsx>{`
+    <style global jsx>{`
       :global(body) {
         margin: 0;
         font-family: -apple-system,BlinkMacSystemFont,Avenir Next,Avenir,Helvetica,sans-serif;
@@ -54,8 +55,31 @@ const Nav = () => (
         text-decoration: none;
         font-size: 13px;
       }
+      .hero {
+        width: 100%;
+        color: #333;
+      }
+      .title {
+        margin: 0;
+        width: 100%;
+        padding-top: 20px;
+        line-height: 1.15;
+        font-size: 48px;
+      }
+      .title, .description {
+        text-align: center;
+      }
+      .row {
+        max-width: 880px;
+        margin: 10px auto 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+      }
     `}</style>
   </nav>
+  {props.children}
+  </div>
 )
 
 export default Nav
