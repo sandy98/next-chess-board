@@ -18,7 +18,7 @@ export default class Index extends Component {
         <Nav>
 
         <div className="hero">
-          <h2 className="title">React Chess Board v0.01</h2>
+          <h2 className="title">React Chess Board v0.1.0</h2>
           <p className="description">
             What are you waiting? Go to <Link href="/boardpage"><a>Board Page</a></Link>
           </p>
