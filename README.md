@@ -3,12 +3,54 @@
 ## Table of Contents
 
 - [Install](#install)
+- [Usage](#usage)
 - [Technology](#technology)
 
 
 ## Install
-  
 
+Download
+```sh
+   git clone https://github.com/sandy98/next-chess-board
+```
+or
+```sh
+   git clone github.com/sandy98/next-chess-board.git
+```
+then install dependencies
+```sh
+   cd next-chess-board
+   yarn
+```
+or
+```sh
+   cd next-chess-board
+   npm install
+```
+then test
+```sh
+   yarn dev
+```
+or
+```sh
+   npm run dev
+```
+
+If everything works ok, now you are able to use it.
+  The main component lives in `components/board.js`
+  You can take this file and put it wherever you see fit in your proyect, then, for instance in your `index.js`:
+  
+    import ChessBoard from 'whereyouputit\board'
+    
+    export default = () => (
+      <div>
+        <Chessboard />
+      </div>
+
+## Usage
+
+Fine tuning of the component.
+Yet to be written.
 
 ## Technology
 
