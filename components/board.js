@@ -40,7 +40,8 @@ const isSameRow = (sq1, sq2) => difRow(sq1, sq2) === 0
 const isDiagonal = (sq1, sq2) => (sq1 != sq2) && (difRow(sq1, sq2) === difCol(sq1, sq2))
 const isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
 const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((row(sq) % 2 === 1) && (col(sq) % 2 === 1))
-const sq2pgn = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
+const sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
+const san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
 
 const letter2img = {p: 'p.png', P: 'pw.png', 
                      n: 'n.png', N: 'nw.png', 
@@ -64,7 +65,8 @@ export default class ChessBoard extends Component {
         positions: this.props.positions || defaultSettings.positions,
         lightSqsBg: this.props.lightSqsBg || defaultSettings.lightSqsBg,
         darkSqsBg: this.props.darkSqBgs || defaultSettings.darkSqsBg,
-        selectedSq: -1
+        selectedSq: -1,
+        isDragging: false
       }
       this.sqFrom = -1
       this.figureFrom = ''
@@ -99,7 +101,7 @@ export default class ChessBoard extends Component {
     }
 
     move = async (sqFrom, sqTo, figure, crowning) => {
-      console.log(`move(sqFrom=${sq2pgn(sqFrom ^ 56)}, sqTo=${sq2pgn(sqTo ^ 56)}, figure=${figure}}`)
+      console.log(`move(sqFrom=${sq2san(sqFrom ^ 56)}, sqTo=${sq2san(sqTo ^ 56)}, figure=${figure}}`)
       if (crowning) {
         figure = crowning
       }
@@ -127,31 +129,31 @@ export default class ChessBoard extends Component {
           newPos[61] = 'R'
       }
       this.state.positions.push(newPos.join(''))
-          this.setState({currentPosition: this.state.currentPosition + 1})
+          this.setState({currentPosition: this.state.positions.length - 1})
       }
     }
 
-    onClick = (sq, sqIndex, figure, evt) => {
+    onClick = (sq, figure, evt) => {
       evt.preventDefault()
       if (this.sqFrom === -1) {
         if (figure === '0') {
           return
         }
         else {
-          this.sqFrom = sqIndex
+          this.sqFrom = sq
           this.figureFrom = figure
-          this.setState({selectedSq: sq})
-          console.log(`Selected square class name: ${this.refs[sq2pgn(sq)].className}`)
+          this.setState({selectedSq: sq, isDragging: false})
+          console.log(`Selected square class name: ${this.refs[sq2san(sq ^ 56)].className}`)
         }
       }
       else {
-        if (this.sqFrom === sqIndex) {
+        if (this.sqFrom === sq) {
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
         }
         else {
-          this.move(this.sqFrom, sqIndex, this.figureFrom)
+          this.move(this.sqFrom, sq, this.figureFrom)
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
@@ -159,23 +161,33 @@ export default class ChessBoard extends Component {
       }
     }
 
-    onDragStart = (sq, sqIndex, figure, evt) => {
-      console.log(`Drag started at sq ${sq2pgn(sq)} with figure ${figure}`)
-      this.sqFrom = sqIndex
+    onDragStart = (sq, figure, evt) => {
+      //console.log(`Drag started at sq ${sq2san(sq ^ 56)} with figure ${figure}`)
+      //let img = evt.target.cloneNode(true)
+      //let offset = this.state.size / 16
+      //img.src = evt.target.getAttribute("src")
+      //img.width = `${offset * 2}px`
+      //img.height = `${offset * 2}px`
+      //evt.dataTransfer.setDragImage(img, offset, offset)
+      this.sqFrom = sq
       this.figureFrom = figure
-      this.setState({selectedSq: sq})
+      this.setState({selectedSq: sq, isDragging: true})
     }
 
-    onDrop = (sq, sqIndex, evt) => {
+    onDragEnd = (evt) => {
+        this.setState({isDragging: false})
+    }
+
+    onDrop = (sq, evt) => {
       evt.preventDefault()
-      console.log(`onDrop(sq=${sq}, sqIndex=${sqIndex})`)
-      if (sqIndex === this.sqFrom) {
+      console.log(`onDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
+      if (sq === this.sqFrom) {
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
           return
       }
-      this.move(this.sqFrom, sqIndex, this.figureFrom)
+      this.move(this.sqFrom, sq, this.figureFrom)
       this.sqFrom = -1
       this.figureFrom = ''
       this.setState({selectedSq: -1})
@@ -183,17 +195,19 @@ export default class ChessBoard extends Component {
 
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
-      console.log(`Selected square = ${sq2pgn(this.state.selectedSq)}`)
-      let chosenRows = this.state.flipped ? flippedRows : unflippedRows
+      console.log(`Selected square = ${sq2san(this.state.selectedSq ^ 56)}`)
+      let chosenRows = this.state.flipped ? 
+                         range(7, -1).map(n => range(n * 8 + 7, n * 8 - 1 )) : 
+                         range().map(n => range(n * 8, n * 8 + 8))
       let rows = chosenRows.map((row, nrow) => {
           let rowIndex = this.state.flipped ? nrow : 7 - nrow
           return (<div key={rowIndex} style={{height: `${this.state.size / 8}px`, 
                                               width: `${this.state.size}px`,
                                               textAlign: 'center'}}>
               {row.map(
-                (sqIndex, index) => {
-                  let dataIndex = (nrow * 8 + index) ^ (this.state.flipped ? 63 : 0)
-                  let figure = this.state.positions[this.state.currentPosition][dataIndex]
+                (sq, index) => {
+                  let san = sq2san(sq ^ 56)
+                  let figure = this.state.positions[this.state.currentPosition][sq]
                   let content, imgsrc
                   if (figure === '0') {
                     content = ''
@@ -206,28 +220,26 @@ export default class ChessBoard extends Component {
                           style={{
                             width: "100%",
                             height: "100%",
-                            cursor: "pointer"
+                            cursor: "pointer",
+                            opacity: this.state.isDragging && this.state.selectedSq === sq ? "0" : "1",
                           }}
-                          onDragStart={evt => this.onDragStart(sqIndex, dataIndex, figure, evt)}
-                          onDragEnd={f => f}
+                          onDragStart={evt => this.onDragStart(sq, figure, evt)}
+                          onDragEnd={ev => this.onDragEnd(ev)}
                         /> 
                     )
                   }
                   return (
-                    <div key={sqIndex}
-                         onClick={(evt) => this.onClick(sqIndex, dataIndex, figure, evt)}
+                    <div key={sq}
+                         onClick={(evt) => this.onClick(sq, figure, evt)}
                          onDragOver={(evt) => {evt.preventDefault()}}
-                         onDrop={(evt) => this.onDrop(sqIndex, dataIndex, evt)} 
-                         className={sqIndex === this.state.selectedSq ? 'selectedSq' : 'unselectedSq'}
+                         onDrop={(evt) => this.onDrop(sq, evt)} 
+                         className={sq === this.state.selectedSq ? 'selectedSq' : 'unselectedSq'}
                          style={{display: 'inline-block', 
                                  width: `${this.state.size / 8}px`,
                                  height: `${this.state.size / 8}px`,
-                                 backgroundColor: isBlackSquare(sqIndex) ? this.state.darkSqsBg : this.state.lightSqsBg}}
-                         datasquare={sqIndex}
-                         ref={sq2pgn(sqIndex)}
-                         dataindex={dataIndex}
-                         title={sq2pgn(sqIndex)}
-                         hiddendata={`sqI: ${sqIndex} I: ${dataIndex} Sq: ${sq2pgn(sqIndex)}`}  
+                                 backgroundColor: isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
+                         ref={san}
+                         title={san}
                     >
                       {content}  
                     </div>
