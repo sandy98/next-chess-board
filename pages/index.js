@@ -4,6 +4,8 @@ import Head from '../components/head'
 import Nav from '../components/nav'
 import ReactMarkdown from 'react-markdown'
 import 'isomorphic-fetch'
+import ChessBoard from '../components/board'
+
 
 export default class Index extends Component {
   static async getInitialProps() {
@@ -17,6 +19,9 @@ export default class Index extends Component {
         <Head title="Home" />
         <Nav>
 
+        <div className="row">
+                <ChessBoard size={160} flipped={true}/>
+        </div>
         <div className="hero">
           <h2 className="title">React Chess Board v0.1.0</h2>
           <p className="description">
