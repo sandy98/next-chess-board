@@ -44,7 +44,7 @@ You can take this file and put it wherever you see fit in your proyect, then, fo
 ```js  
     import ChessBoard from 'whereyouputit\board'
     
-    export default = () => (
+    export default () => (
       <div>
         <Chessboard />
       </div>
