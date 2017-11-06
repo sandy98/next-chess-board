@@ -42,7 +42,7 @@ The main component lives in `components/board.js`
 You can take this file and put it wherever you see fit in your proyect, then, for instance in your `index.js`:
 
 ```js  
-    import ChessBoard from 'whereyouputit\board'
+    import ChessBoard from 'whereyouputit/board'
     
     export default () => (
       <div>
