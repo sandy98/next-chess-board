@@ -26,7 +26,9 @@ const defaultSettings = {
   currentPosition: 0,
   positions: [defaultPosition],
   lightSqsBg: lightSqBgs[0],
-  darkSqsBg: darkSqBgs[0]
+  darkSqsBg: darkSqBgs[0],
+  whoMoves: 'w',
+  isCrowning: false
 }
 
 //
@@ -42,6 +44,7 @@ const isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2
 const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((row(sq) % 2 === 1) && (col(sq) % 2 === 1))
 const sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
 const san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
+const figureColor = (figure) => figure === figure.toLowerCase() ? 'b' : 'w'
 
 const letter2img = {p: 'p.png', P: 'pw.png', 
                      n: 'n.png', N: 'nw.png', 
@@ -65,8 +68,10 @@ export default class ChessBoard extends Component {
         positions: this.props.positions || defaultSettings.positions,
         lightSqsBg: this.props.lightSqsBg || defaultSettings.lightSqsBg,
         darkSqsBg: this.props.darkSqBgs || defaultSettings.darkSqsBg,
+        whoMoves: this.props.whoMoves || defaultSettings.whoMoves,
         selectedSq: -1,
-        isDragging: false
+        isDragging: false,
+        isCrowning: false,
       }
       this.sqFrom = -1
       this.figureFrom = ''
@@ -80,7 +85,8 @@ export default class ChessBoard extends Component {
 
     componentDidMount() {
       //this.reset()
-     console.log("Mounted board!") 
+     //console.log("Mounted board!")
+     window.board1 = this 
     }
 
     flip = () => {
@@ -169,6 +175,7 @@ export default class ChessBoard extends Component {
       //img.width = `${offset * 2}px`
       //img.height = `${offset * 2}px`
       //evt.dataTransfer.setDragImage(img, offset, offset)
+      //evt.target.style.opacity = '1.0'
       this.sqFrom = sq
       this.figureFrom = figure
       this.setState({selectedSq: sq, isDragging: true})
@@ -201,9 +208,11 @@ export default class ChessBoard extends Component {
                          range().map(n => range(n * 8, n * 8 + 8))
       let rows = chosenRows.map((row, nrow) => {
           let rowIndex = this.state.flipped ? nrow : 7 - nrow
-          return (<div key={rowIndex} style={{height: `${this.state.size / 8}px`, 
+          return (<div key={rowIndex} ref={`row_${rowIndex}`} style={{height: `${this.state.size / 8}px`, 
                                               width: `${this.state.size}px`,
-                                              textAlign: 'center'}}>
+                                              textAlign: 'center', 
+                                              backgroundColor: '#3333333',
+                                              visibility: this.state.isCrowning ? 'hidden' : 'visible'}}>
               {row.map(
                 (sq, index) => {
                   let san = sq2san(sq ^ 56)
@@ -217,6 +226,8 @@ export default class ChessBoard extends Component {
                     content = (
                         <img
                           src={imgsrc}
+                          figure={figure}
+                          color={figureColor(figure)}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -237,9 +248,11 @@ export default class ChessBoard extends Component {
                          style={{display: 'inline-block', 
                                  width: `${this.state.size / 8}px`,
                                  height: `${this.state.size / 8}px`,
-                                 backgroundColor: isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
+                                 backgroundColor: sq === this.state.selectedSq ? 'lightgreen' :
+                                                  isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
                          ref={san}
-                         title={san}
+                         tooltip={san}
+                         color={isBlackSquare(sq ^ 56) ? 'b' : 'w'}
                     >
                       {content}  
                     </div>
@@ -255,15 +268,17 @@ export default class ChessBoard extends Component {
           style={{
             width: `${this.state.size}px`,
             height: `${this.state.size}px`,
-            border: 'solid 1px navy'
+            border: 'solid 1px navy',
+            backgroundColor: '#333333',
+            opacity: this.state.isCrowning ? '0.8' : '1'
           }}
         >
-          {rows}
-          <style jsx>{`
+          <style global jsx>{`
             .selectedSq {
               background: lightcoral;    
             }
           `}</style>
+          {rows}
         </div>
       )
     }

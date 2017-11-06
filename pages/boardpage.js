@@ -8,7 +8,7 @@ export default () => {
   let board1
   return (
   <div>
-    <Head title="Home" />
+    <Head title="Test Chess Board" />
     <Nav>
         <div className="hero" style={{backgroundImage: 'url("static/img/monstruos.jpg")',
                                       backgoundSize: '800px 600px',
