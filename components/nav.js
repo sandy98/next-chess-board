@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const links = [
   {href: '/boardpage', label: 'Board'},
-  { href: 'https://github.com/sandy98/next-chess-board', label: 'Github' }
+  { href: 'https://github.com/sandy98/next-chess-board', label: 'Fork me at Github' }
 ].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`
   return link
