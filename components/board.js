@@ -3,9 +3,10 @@ import {Component} from 'react'
 const range = (b = 0, e = b + 8, r = []) => {
   if (b === e)
     return r
-  r.push(b)
-  return range(b < e ? b + 1 : b - 1, e, r)
+  return range(b < e ? b + 1 : b - 1, e, [...r, b])
 }
+
+const compose = (...fns) => (arg) => fns.reduce((a, f) => f(a), arg)
 
 const unflippedRows = [range(56), range(48), range(40), range(32), range(24), range(16), range(8), range()]
 const flippedRows = [range(7, -1), range(15, 7), range(23, 15), range(31, 23), 
@@ -15,6 +16,7 @@ const flippedRows = [range(7, -1), range(15, 7), range(23, 15), range(31, 23),
 const lightSqBgs = ['#dfdfdf', '#f5ca8f']
 const darkSqBgs = ['#56b6e2', '#af9677']
 
+const emptyPosition = range(0, 64).map(i =>'0').join('')
 const defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
 const sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
                                        
@@ -44,7 +46,7 @@ const isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2
 const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((row(sq) % 2 === 1) && (col(sq) % 2 === 1))
 const sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
 const san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
-const figureColor = (figure) => figure === figure.toLowerCase() ? 'b' : 'w'
+const figureColor = (figure) => figure ? figure === figure.toLowerCase() ? 'b' : 'w' : '-'
 
 const letter2img = {p: 'p.png', P: 'pw.png', 
                      n: 'n.png', N: 'nw.png', 
@@ -78,9 +80,14 @@ export default class ChessBoard extends Component {
       this.moveValidator = props.moveValidator || null
     }
 
+    empty = () => {
+      this.setState({positions: [emptyPosition],
+        currentPosition: 0})
+    }
+
     reset = () => {
-      this.setState({positions: this.state.positions.splice(0, 1),
-                     currentPosition: this.props.currentPosition || defaultSettings.currentPosition})
+      this.setState({positions: [defaultPosition],
+                     currentPosition: 0})
     }
 
     componentDidMount() {
@@ -93,8 +100,9 @@ export default class ChessBoard extends Component {
       this.setState({flipped: !this.state.flipped})
     } 
 
-    getCrowning = (fig) => {
-        let crowned 
+    getCrowning = (sqFrom, sqTo, fig) => {
+        /*
+        let crowned
         while (!crowned) {
           crowned = prompt("Choose promotion(Q, R, N, B)", "Q")
         }
@@ -104,17 +112,30 @@ export default class ChessBoard extends Component {
         else {
             return crowned.toUpperCase()
         }
+        */
+        this.crowningInfo = {sqFrom: sqFrom,
+                             sqTo: sqTo,
+                             figure: fig,
+                             sqColor: isBlackSquare(sqTo ^ 56) ? 'b' : 'w',
+                             figColor: figureColor(fig),
+                             top: this.refs[sq2san(sqTo ^ 56)].offsetTop,
+                             left: this.refs[sq2san(sqTo ^ 56)].offsetLeft,
+                            }
+        this.setState({isCrowning: true})
     }
 
-    move = async (sqFrom, sqTo, figure, crowning) => {
+    move = (sqFrom, sqTo, figure, crowning) => {
       console.log(`move(sqFrom=${sq2san(sqFrom ^ 56)}, sqTo=${sq2san(sqTo ^ 56)}, figure=${figure}}`)
-      if (crowning) {
-        figure = crowning
+      /* if (this.state.isCrowning) {
+        return
+      } */
+
+      if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
+          this.getCrowning(sqFrom, sqTo, figure)
+          return
       }
-      else if ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7)) {
-          figure = await this.getCrowning(figure)
-      }
-      if (!this.moveValidator) {
+      if (!this.props.moveValidator) {
+          if (crowning) {figure = crowning} 
           let newPos = [...this.state.positions[this.state.currentPosition]]
           newPos[sqFrom] = '0'
           newPos[sqTo] = figure
@@ -135,11 +156,11 @@ export default class ChessBoard extends Component {
           newPos[61] = 'R'
       }
       this.state.positions.push(newPos.join(''))
-          this.setState({currentPosition: this.state.positions.length - 1})
+      this.setState({currentPosition: this.state.positions.length - 1})
       }
     }
 
-    onClick = (sq, figure, evt) => {
+    onSquareClick = (sq, figure, evt) => {
       evt.preventDefault()
       if (this.sqFrom === -1) {
         if (figure === '0') {
@@ -167,27 +188,19 @@ export default class ChessBoard extends Component {
       }
     }
 
-    onDragStart = (sq, figure, evt) => {
-      //console.log(`Drag started at sq ${sq2san(sq ^ 56)} with figure ${figure}`)
-      //let img = evt.target.cloneNode(true)
-      //let offset = this.state.size / 16
-      //img.src = evt.target.getAttribute("src")
-      //img.width = `${offset * 2}px`
-      //img.height = `${offset * 2}px`
-      //evt.dataTransfer.setDragImage(img, offset, offset)
-      //evt.target.style.opacity = '1.0'
+    onFigureDragStart = (sq, figure, evt) => {
       this.sqFrom = sq
       this.figureFrom = figure
       this.setState({selectedSq: sq, isDragging: true})
     }
 
-    onDragEnd = (evt) => {
+    onFigureDragEnd = (evt) => {
         this.setState({isDragging: false})
     }
 
-    onDrop = (sq, evt) => {
+    onSquareDrop = (sq, evt) => {
       evt.preventDefault()
-      console.log(`onDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
+      console.log(`onSquareDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
       if (sq === this.sqFrom) {
           this.sqFrom = -1
           this.figureFrom = ''
@@ -202,7 +215,7 @@ export default class ChessBoard extends Component {
 
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
-      console.log(`Selected square = ${sq2san(this.state.selectedSq ^ 56)}`)
+      // console.log(`Selected square = ${sq2san(this.state.selectedSq ^ 56)}`)
       let chosenRows = this.state.flipped ? 
                          range(7, -1).map(n => range(n * 8 + 7, n * 8 - 1 )) : 
                          range().map(n => range(n * 8, n * 8 + 8))
@@ -212,7 +225,7 @@ export default class ChessBoard extends Component {
                                               width: `${this.state.size}px`,
                                               textAlign: 'center', 
                                               backgroundColor: '#3333333',
-                                              visibility: this.state.isCrowning ? 'hidden' : 'visible'}}>
+                                              opacity: this.state.isCrowning ? '0.5' : '1'}}>
               {row.map(
                 (sq, index) => {
                   let san = sq2san(sq ^ 56)
@@ -234,16 +247,16 @@ export default class ChessBoard extends Component {
                             cursor: "pointer",
                             opacity: this.state.isDragging && this.state.selectedSq === sq ? "0" : "1",
                           }}
-                          onDragStart={evt => this.onDragStart(sq, figure, evt)}
-                          onDragEnd={ev => this.onDragEnd(ev)}
+                          onDragStart={evt => this.onFigureDragStart(sq, figure, evt)}
+                          onDragEnd={ev => this.onFigureDragEnd(ev)}
                         /> 
                     )
                   }
                   return (
                     <div key={sq}
-                         onClick={(evt) => this.onClick(sq, figure, evt)}
+                         onClick={(evt) => this.onSquareClick(sq, figure, evt)}
                          onDragOver={(evt) => {evt.preventDefault()}}
-                         onDrop={(evt) => this.onDrop(sq, evt)} 
+                         onDrop={(evt) => this.onSquareDrop(sq, evt)} 
                          className={sq === this.state.selectedSq ? 'selectedSq' : 'unselectedSq'}
                          style={{display: 'inline-block', 
                                  width: `${this.state.size / 8}px`,
@@ -272,13 +285,55 @@ export default class ChessBoard extends Component {
             backgroundColor: '#333333',
             opacity: this.state.isCrowning ? '0.8' : '1'
           }}
-        >
-          <style global jsx>{`
-            .selectedSq {
-              background: lightcoral;    
-            }
-          `}</style>
+        > 
           {rows}
+          <div ref="crowningPanel"
+               style={{width: this.state.size / 2,
+                       height: this.state.size / 8, 
+                       color: 'white',
+                       display: this.state.isCrowning ? 'block' : 'none',
+                       position: 'fixed',
+                       left: this.crowningInfo ? this.crowningInfo.left : 0,
+                       top:  this.crowningInfo ? this.crowningInfo.top : 0,
+                       zIndex: '100'
+                       }}
+          >
+            {['q', 'n', 'r', 'b'].map((f) => this.crowningInfo ? (this.crowningInfo.figColor === 'w' ? f.toUpperCase() : f) : f)
+                                .map((figure, i) => {
+                let wh = this.state.size / 8
+                let ref = `crowning_${figure}`
+                return (
+                  <div style={{
+                    display: 'inline-block',
+                    width: wh,
+                    height: wh,
+                    backgroundColor: this.crowningInfo ? 
+                                      (this.crowningInfo.sqColor === 'b' ?  this.state.darkSqsBg : this.state.lightSqsBg) : 
+                                      this.state.darkSqsBg
+                    }}
+                    onClick={e => {
+                      let {sqFrom, sqTo, figureFrom} = this.crowningInfo
+                      this.setState({isCrowning: false})
+                      this.move(sqFrom, sqTo, figureFrom, figure)
+                    }}
+
+                    ref={ref}
+                    key={i}
+                  >
+                    <img
+                      src={`/static/img/sets/${this.state.chessSet}/${ letter2img[figure] }`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        cursor: 'pointer'
+                      }}
+                    />
+                  </div>
+                )
+              }
+
+            )}
+          </div>
         </div>
       )
     }
