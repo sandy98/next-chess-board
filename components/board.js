@@ -91,6 +91,14 @@ export default class ChessBoard extends Component {
       this.moveValidator = props.moveValidator || null
     }
 
+    goto = (n) => {
+      let n1
+      if (n >= this.state.positions.length) {n1 = this.state.positions.length - 1}
+      else if (n < 0) {n1 = 0}
+      else {n1 = n}
+      this.setState({currentPosition: n1})
+    }
+
     empty = () => {
       this.setState({positions: [emptyPosition],
         currentPosition: 0, whoMoves: this.props.whoMoves || defaultSettings.whoMoves})
@@ -128,12 +136,13 @@ export default class ChessBoard extends Component {
         */
         this.crowningInfo = {sqFrom: sqFrom,
                              sqTo: sqTo,
-                             figure: fig,
+                             figureFrom: fig,
                              sqColor: isBlackSquare(sqTo ^ 56) ? 'b' : 'w',
                              figColor: figureColor(fig),
                              top: this.refs[sq2san(sqTo ^ 56)].offsetTop,
                              left: this.refs[sq2san(sqTo ^ 56)].offsetLeft,
                             }
+        // console.log(`crowningInfo:\n${this.crowningInfo}`)
         this.setState({isCrowning: true})
     }
 
@@ -341,6 +350,7 @@ export default class ChessBoard extends Component {
                     onClick={e => {
                       let {sqFrom, sqTo, figureFrom} = this.crowningInfo
                       this.setState({isCrowning: false})
+                      console.log(`figureFrom: ${figureFrom} - figure: ${figure}`)
                       this.move(sqFrom, sqTo, figureFrom, figure)
                     }}
 
