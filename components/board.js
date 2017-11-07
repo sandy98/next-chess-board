@@ -1,17 +1,28 @@
 import {Component} from 'react'
 
-const range = (b = 0, e = b + 8, r = []) => {
-  if (b === e)
-    return r
-  return range(b < e ? b + 1 : b - 1, e, [...r, b])
-}
+/* General functions */
+
+const range = (b = 0, e = b + 8, r = []) => 
+  b === e ? r : range(b < e ? b + 1 : b - 1, e, [...r, b])
+
 
 const compose = (...fns) => (arg) => fns.reduce((a, f) => f(a), arg)
 
+const partition = (arr, n = 8, r = []) => 
+  arr.length > 0 ? partition(arr.slice(n), n, [...r, arr.slice(0, n)]) : r
+
+/* End of general functions */
+
+/*
 const unflippedRows = [range(56), range(48), range(40), range(32), range(24), range(16), range(8), range()]
 const flippedRows = [range(7, -1), range(15, 7), range(23, 15), range(31, 23), 
                      range(39, 31), range(47, 39), range(55, 47), range(63, 55)]
 
+*/
+
+const partPosition = (pos) => partition([...pos]).map(r => r.join('')).join('/')
+const compressPosition = (pos) => partPosition(pos).replace(/0+/g, (m => m.length.toString()))
+const expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => range(0, parseInt(d)).map(i => '0').join(''))
 
 const lightSqBgs = ['#dfdfdf', '#f5ca8f']
 const darkSqBgs = ['#56b6e2', '#af9677']
@@ -155,8 +166,8 @@ export default class ChessBoard extends Component {
           newPos[63] = '0'
           newPos[61] = 'R'
       }
-      this.state.positions.push(newPos.join(''))
-      this.setState({currentPosition: this.state.positions.length - 1})
+      const newCurrPos = this.state.positions.length
+      this.setState({currentPosition: newCurrPos, positions: [...this.state.positions, newPos.join('')]})
       }
     }
 
