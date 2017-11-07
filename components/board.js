@@ -93,13 +93,15 @@ export default class ChessBoard extends Component {
 
     empty = () => {
       this.setState({positions: [emptyPosition],
-        currentPosition: 0})
+        currentPosition: 0, whoMoves: this.props.whoMoves || defaultSettings.whoMoves})
     }
 
     reset = () => {
       this.setState({positions: [defaultPosition],
-                     currentPosition: 0})
+                     currentPosition: 0, whoMoves: this.props.whoMoves || defaultSettings.whoMoves})
     }
+
+    isFlipped = () => this.state.flipped
 
     componentDidMount() {
       //this.reset()
@@ -140,7 +142,7 @@ export default class ChessBoard extends Component {
       /* if (this.state.isCrowning) {
         return
       } */
-
+      if (this.state.whoMoves !== figureColor(figure)) {return}
       if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
           this.getCrowning(sqFrom, sqTo, figure)
           return
@@ -167,12 +169,19 @@ export default class ChessBoard extends Component {
           newPos[61] = 'R'
       }
       const newCurrPos = this.state.positions.length
-      this.setState({currentPosition: newCurrPos, positions: [...this.state.positions, newPos.join('')]})
+      this.setState({currentPosition: newCurrPos, positions: [...this.state.positions, newPos.join('')],
+                     whoMoves: this.state.whoMoves === 'w' ? 'b' : 'w'})
       }
     }
 
     onSquareClick = (sq, figure, evt) => {
       evt.preventDefault()
+      if (this.state.whoMoves !== figureColor(figure) && this.sqFrom === -1) {
+        //this.sqFrom = -1
+        //this.figureFrom = -1
+        //this.setState({selectedSq: -1})
+        return
+      }
       if (this.sqFrom === -1) {
         if (figure === '0') {
           return
@@ -200,6 +209,12 @@ export default class ChessBoard extends Component {
     }
 
     onFigureDragStart = (sq, figure, evt) => {
+      if (this.state.whoMoves !== figureColor(figure)) {
+        this.sqFrom = -1
+        this.figureFrom = ''
+        this.setState({selectedSq: -1})
+        return false
+      }
       this.sqFrom = sq
       this.figureFrom = figure
       this.setState({selectedSq: sq, isDragging: true})
@@ -211,8 +226,8 @@ export default class ChessBoard extends Component {
 
     onSquareDrop = (sq, evt) => {
       evt.preventDefault()
-      console.log(`onSquareDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
-      if (sq === this.sqFrom) {
+      //console.log(`onSquareDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
+      if (sq === this.sqFrom || this.state.whoMoves != figureColor(this.figureFrom)) {
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
@@ -250,12 +265,13 @@ export default class ChessBoard extends Component {
                     content = (
                         <img
                           src={imgsrc}
+                          draggable={figureColor(figure) === this.state.whoMoves ? true : false}
                           figure={figure}
                           color={figureColor(figure)}
                           style={{
                             width: "100%",
                             height: "100%",
-                            cursor: "pointer",
+                            cursor: figureColor(figure) === this.state.whoMoves ? "pointer" : "not-allowed",
                             opacity: this.state.isDragging && this.state.selectedSq === sq ? "0" : "1",
                           }}
                           onDragStart={evt => this.onFigureDragStart(sq, figure, evt)}

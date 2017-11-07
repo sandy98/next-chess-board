@@ -22,8 +22,10 @@ export default () => {
                 <ChessBoard id={v4()} size={480} ref={(b1) => board1 = b1}/>
             </div>
             <div className="row">
-                <button onClick={() => board1.flip()}>Flip</button>
                 <button onClick={() => board1.reset()}>Restart Game</button>
+                <button onClick={() => board1.flip()}>
+                  {board1 ? (board1.isFlipped() ? 'Unflip' : 'Flip') : 'Flip'}
+                </button>
             </div>
         </div>
     </Nav>
