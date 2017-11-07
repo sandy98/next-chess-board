@@ -99,6 +99,11 @@ export default class ChessBoard extends Component {
       this.setState({currentPosition: n1})
     }
 
+    previous = () => this.goto(this.state.currentPosition - 1)
+    next = () => this.goto(this.state.currentPosition + 1)
+    last = () => this.goto(this.state.positions.length - 1)
+    first = () => this.goto(0)
+
     empty = () => {
       this.setState({positions: [emptyPosition],
         currentPosition: 0, whoMoves: this.props.whoMoves || defaultSettings.whoMoves})
@@ -151,6 +156,7 @@ export default class ChessBoard extends Component {
       /* if (this.state.isCrowning) {
         return
       } */
+      if (this.state.currentPosition !== this.state.positions.length - 1) {return}
       if (this.state.whoMoves !== figureColor(figure)) {return}
       if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
           this.getCrowning(sqFrom, sqTo, figure)
