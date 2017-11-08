@@ -38,6 +38,10 @@ export default class Index extends Component {
                                        borderRadius: '10px',
                                        }}>
             <ReactMarkdown source={this.props.readme} />
+            <br/><br/>
+            <div style={{textAlign: 'center'}}>
+              <img src="static/img/coronando_reyes.jpeg" style={{borderRadius: '50px'}} />
+            </div>
           </div>
         </div>
       </Nav>

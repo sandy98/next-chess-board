@@ -5,7 +5,6 @@ import {Component} from 'react'
 const range = (b = 0, e = b + 8, r = []) => 
   b === e ? r : range(b < e ? b + 1 : b - 1, e, [...r, b])
 
-
 const compose = (...fns) => (arg) => fns.reduce((a, f) => f(a), arg)
 
 const partition = (arr, n = 8, r = []) => 
@@ -315,7 +314,7 @@ export default class ChessBoard extends Component {
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
       // console.log(`Selected square = ${sq2san(this.state.selectedSq ^ 56)}`)
-      let figures = this.figuresCurrent()
+      let figures = expandPosition(this.state.positions[this.state.currentPosition].split(/\s+/)[0])
       let chosenRows = this.state.flipped ? 
                          range(7, -1).map(n => range(n * 8 + 7, n * 8 - 1 )) : 
                          range().map(n => range(n * 8, n * 8 + 8))
@@ -362,7 +361,7 @@ export default class ChessBoard extends Component {
                          style={{display: 'inline-block', 
                                  width: `${this.state.size / 8}px`,
                                  height: `${this.state.size / 8}px`,
-                                 backgroundColor: sq === this.state.selectedSq ? 'lightgreen' :
+                                 backgroundColor: sq === this.state.selectedSq ? '#a4fff4' :
                                                   isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
                          ref={san}
                          tooltip={san}
