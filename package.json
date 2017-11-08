@@ -7,6 +7,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "chess.js": "^0.10.2",
     "isomorphic-fetch": "^2.2.1",
     "next": "^4.1.4",
     "react": "^16.0.0",

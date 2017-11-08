@@ -51,7 +51,8 @@ export default () => {
       }
 
     `}</style>
-    <Head title="Test Chess Board" />
+
+    <Head title="Test Chess Board - Controlled Movements" />
     <Nav>
         <div className="hero" style={{backgroundImage: 'url("static/img/monstruos.jpg")',
                                       backgoundSize: '800px 600px',
@@ -63,7 +64,7 @@ export default () => {
                                       borderRadius: '15px'
                                       }}>
             <div className="row">
-                <ChessBoard id={v4()} size={480} ref={(b1) => board1 = b1}/>
+                <ChessBoard id={v4()} size={480} moveValidator={true} ref={(b1) => board1 = b1}/>
             </div>
             <div className="row" style={{backgroundColor: '#dfdfdf', 
                                          padding: '10px', 

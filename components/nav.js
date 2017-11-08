@@ -2,7 +2,8 @@ import Head from './head'
 import Link from 'next/link'
 
 const links = [
-  {href: '/boardpage', label: 'Board'},
+  {href: '/boardpage1', label: 'Free Movements Board'},
+  {href: '/boardpage2', label: 'Controlled Board'},
   { href: 'https://github.com/sandy98/next-chess-board', label: 'Fork me at Github' }
 ].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`
@@ -23,7 +24,7 @@ const Nav = (props) => (
           ({ key, href, label }) => (
             <li key={key}>
               <Link prefetch href={href}>
-                <a>{label}</a>
+                <a style={{marginRight: '3em'}}>{label}</a>
               </Link>
             </li>
           )

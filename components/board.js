@@ -1,4 +1,5 @@
 import {Component} from 'react'
+import Chess from 'chess.js'
 
 /* General functions */
 
@@ -25,16 +26,16 @@ const partPosition = (pos) => partition([...pos]).map(r => r.join('')).join('/')
 const compressPosition = (pos) => partPosition(pos).replace(/0+/g, (m => m.length.toString()))
 const expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => range(0, parseInt(d)).map(i => '0').join(''))
 
-const lightSqBgs = ['#dfdfdf', '#ffd59a']
-const darkSqBgs = ['#56b6e2', '#af9677']
+const lightSqBgs = ['#dfdfdf', '#f0d9b5']
+const darkSqBgs = ['#56b6e2', '#b58863']
 
 const emptyPosition = range(0, 64).map(i =>'0').join('')
 const defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
 const sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
  
-const emptyFen = '8/8/8/8/8/8/8/8 w - - 1 0'
-const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0'
-const siciliaFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 0'
+const emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
+const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+const siciliaFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
 
 const defaultSettings = {
   size: 400,
@@ -118,6 +119,10 @@ export default class ChessBoard extends Component {
     }
 
     reset = () => {
+      if (this.props.moveValidator) {
+        this.game = new Chess(defaultFen)
+        // console.log(`Reset: ${this.game.fen()}`)
+      }
       this.setState({positions: [defaultFen],
                      currentPosition: 0, movements: []})
     }
@@ -130,21 +135,25 @@ export default class ChessBoard extends Component {
     whoMovesFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[1]
     castlingFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[2]
     enPassantFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[3]
-    moveNumberFromPosition = (npos) => parseInt(this.state.positions[npos].split(/\s+/)[4])
-    halfMoveClockFromPosition = (npos) => parseInt(this.state.positions[npos].split(/\s+/)[5])
+    halfMoveClockFromPosition = (npos) => parseInt(this.state.positions[npos].split(/\s+/)[4])
+    moveNumberFromPosition = (npos) => parseInt(this.state.positions[npos].split(/\s+/)[5])
     
     figuresCurrent = () => this.figuresFromPosition(this.state.positions.length - 1)
     whoMovesCurrent = () => this.whoMovesFromPosition(this.state.positions.length - 1)
     castlingCurrent = () => this.castlingFromPosition(this.state.positions.length - 1)
     enPassantCurrent = () => this.enPassantFromPosition(this.state.positions.length - 1)
-    moveNumberCurrent = () => this.moveNumberFromPosition(this.state.positions.length - 1)
     halfMoveClockCurrent = () => this.halfMoveClockFromPosition(this.state.positions.length - 1)
+    moveNumberCurrent = () => this.moveNumberFromPosition(this.state.positions.length - 1)
     
 
     componentDidMount() {
       //this.reset()
      //console.log("Mounted board!")
-     window.board1 = this 
+     window.board1 = this
+      if (this.props.moveValidator) {
+      this.game = new Chess(this.state.positions[0])
+      // console.log(`componentDidMount: ${this.game.fen()}`)
+      }
     }
 
     flip = () => {
@@ -177,7 +186,7 @@ export default class ChessBoard extends Component {
     }
 
     move = (sqFrom, sqTo, figure, crowning) => {
-      console.log(`move(sqFrom=${sq2san(sqFrom ^ 56)}, sqTo=${sq2san(sqTo ^ 56)}, figure=${figure}}`)
+      // console.log(`move(sqFrom=${sq2san(sqFrom ^ 56)}, sqTo=${sq2san(sqTo ^ 56)}, figure=${figure}}`)
       /* if (this.state.isCrowning) {
         return
       } */
@@ -233,16 +242,28 @@ export default class ChessBoard extends Component {
         newEnPassant = sq2san((sqTo + sumando) ^ 56)
       }
 
+      let newHalfMoveClock = this.halfMoveClockCurrent() + 1
+      if (figure === 'p' || figure === 'P' || this.figuresCurrent()[sqTo] !== '0') newHalfMoveClock = 0
+
       let newMoveNumber = this.moveNumberCurrent()
       if (newWhoMoves === 'w') newMoveNumber++  
 
-      let newHalfMoveCount = this.halfMoveClockCurrent() + 1
-      if (figure === 'p' || figure === 'P' || this.figuresCurrent()[sqTo] !== '0') newHalfMoveCount = 0
-
       this.setState({currentPosition: newCurrPos, 
            positions: [...this.state.positions, [newComprPos, newWhoMoves, newCastling, 
-                       newEnPassant, newMoveNumber, newHalfMoveCount].join(' ')],
+                       newEnPassant, newHalfMoveClock, newMoveNumber].join(' ')],
                       movements: [...this.state.movements, {sqFrom, sqTo, figure: oldFigure, crowning}]})
+      }
+      else {
+        let params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
+        params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
+        console.log(`Game move params: from: ${params.from}, to: ${params['to']}, promotion: ${params.promotion}`)
+        let move = this.game.move(params)
+        if (move) {
+          let newCurrentPos = this.state.positions.length
+          this.setState({currentPosition: newCurrentPos, 
+                         positions: [...this.state.positions, this.game.fen()],
+                         movements: [...this.state.movements, move]})
+        }
       }
     }
 
@@ -414,7 +435,7 @@ export default class ChessBoard extends Component {
                     onClick={e => {
                       let {sqFrom, sqTo, figureFrom} = this.crowningInfo
                       this.setState({isCrowning: false})
-                      console.log(`figureFrom: ${figureFrom} - figure: ${figure}`)
+                      // console.log(`figureFrom: ${figureFrom} - figure: ${figure}`)
                       this.move(sqFrom, sqTo, figureFrom, figure)
                     }}
 

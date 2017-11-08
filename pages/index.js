@@ -25,7 +25,7 @@ export default class Index extends Component {
         <div className="hero">
           <h2 className="title">React Chess Board v0.1.0</h2>
           <p className="description">
-            What are you waiting? Go to <Link href="/boardpage"><a>Board Page</a></Link>
+            What are you waiting? Go to <Link href="/boardpage1"><a>Board Page</a></Link>
           </p>
           <div className="" style={{textAlign: 'left',
                                        marginLeft: '5%',
