@@ -32,10 +32,10 @@ const darkSqBgs = ['#56b6e2', '#b58863']
 const emptyPosition = range(0, 64).map(i =>'0').join('')
 const defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
 const sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
- 
+  
 const emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
 const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const siciliaFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
+const sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
 
 const defaultSettings = {
   size: 400,
@@ -263,6 +263,15 @@ export default class ChessBoard extends Component {
           this.setState({currentPosition: newCurrentPos, 
                          positions: [...this.state.positions, this.game.fen()],
                          movements: [...this.state.movements, move]})
+          if (this.game.game_over()) {
+            if (this.game.in_checkmate()) {
+              let result = this.whoMovesCurrent() === 'w' ? '1-0' : '0-1'
+              setTimeout(() => alert(`Checkmate! ${result}`), 100)
+            }
+            else {
+              setTimeout(() => alert(`Game over. It's a draw. 1/2-1/2`), 100)
+            }
+          }
         }
       }
     }
