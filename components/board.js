@@ -265,10 +265,12 @@ export default class ChessBoard extends Component {
                          movements: [...this.state.movements, move]})
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
-              let result = this.whoMovesCurrent() === 'w' ? '1-0' : '0-1'
-              setTimeout(() => alert(`Checkmate! ${result}`), 100)
+              let sans = this.game.history()
+              let san = sans[sans.length - 1]
+              let result = this.game.turn() === 'b' ? '1-0' : '0-1'
+              setTimeout(() => alert(`${san} checkmate. ${result}`), 100)
             }
-            else {
+            else if (this.game.in_draw()) {
               setTimeout(() => alert(`Game over. It's a draw. 1/2-1/2`), 100)
             }
           }
