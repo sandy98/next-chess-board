@@ -1,0 +1,6 @@
+},
+spatial: {
+$f | cut -d. -f1: 
+},
+spatial: {
+$f | cut -d. -f1: 

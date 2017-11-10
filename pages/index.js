@@ -20,7 +20,7 @@ export default class Index extends Component {
         <Nav>
 
         <div className="row">
-                <ChessBoard size={160} flipped={true}/>
+                <ChessBoard size={160} flipped={true} selectedSqBg="yellow" />
         </div>
         <div className="hero">
           <h2 className="title">React Chess Board v0.1.0</h2>
@@ -40,7 +40,7 @@ export default class Index extends Component {
             <ReactMarkdown source={this.props.readme} />
             <br/><br/>
             <div style={{textAlign: 'center'}}>
-              <img src="static/img/coronando_reyes.jpeg" style={{borderRadius: '50px'}} />
+              <img src="static/img/sol-dragon.jpeg" style={{borderRadius: '50px'}} />
             </div>
           </div>
         </div>
