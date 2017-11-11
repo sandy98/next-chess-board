@@ -1073,9 +1073,9 @@ chalk@^2.1.0:
     escape-string-regexp "^1.0.5"
     supports-color "^4.0.0"
 
-chess.js@^0.10.2:
+"chess.js@https://github.com/sandy98/chess.js":
   version "0.10.2"
-  resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-0.10.2.tgz#eacefa2067155f87f046e80cc12d2019eef1b81a"
+  resolved "https://github.com/sandy98/chess.js#857634a60d1cc2db3f3db15c9d2261c92a880278"
 
 chokidar@^1.7.0:
   version "1.7.0"
