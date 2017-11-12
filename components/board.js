@@ -1,3 +1,4 @@
+import {v4} from 'uuid'
 import {Component} from 'react'
 import Chess from 'chess.js'
 
@@ -189,8 +190,27 @@ const letter2img = {p: 'p.png', P: 'pw.png',
 
 export default class ChessBoard extends Component {
     
+    static Events = {
+      CHECK_MATE: "CHECK_MATE",
+      CHECK: "CHECK",
+      STALE_MATE: "STALE_MATE",
+      MOVE: "MOVE"
+      
+    }
+    
+    on = (evt, cb) => {
+      let uuid = v4()
+      this.subscribers = [...this.subscribers, {id: uuid, event: evt, callback: cb}]
+      return () => this.subscribers = this.subscribers.filter((subscriber) => subscriber.id !== uuid) 
+    }
+
+    emit = (evt, data) =>  this.subscribers.filter((subscriber) => subscriber.event === evt).forEach(
+      (subscriber) => subscriber.callback(data)  
+    )
+        
     constructor(props) {
       super(props)
+      this.subscribers = []
       this.state = {
         size: this.props.size || defaultSettings.size,
         flipped: this.props.flipped || defaultSettings.flipped,
@@ -406,12 +426,17 @@ export default class ChessBoard extends Component {
           this.setState({currentPosition: newCurrentPos, 
                          positions: [...this.state.positions, this.game.fen()],
                          movements: [...this.state.movements, move]})
+          
+          let history = this.game.history()
+          this.emit(ChessBoard.Events.MOVE, history[history.length - 1]) 
+          
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
               let sans = this.game.history()
               let san = sans[sans.length - 1]
-              let result = this.game.turn() === 'b' ? '1-0' : '0-1'
-              setTimeout(() => alert(`${san} checkmate. ${result}`), 100)
+              let moveNumber = this.state.positions[this.state.positions.length -1].split(/\s+/)[5]
+              let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}...`]
+              this.emit(ChessBoard.Events.CHECK_MATE, `${dottedMoveNumber}${san} checkmate. ${result}`)
             }
             else if (this.game.in_draw()) {
               setTimeout(() => alert(`Game over. It's a draw. 1/2-1/2`), 100)

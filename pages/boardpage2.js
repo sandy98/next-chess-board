@@ -12,9 +12,17 @@ export default class BoardPage2 extends Component {
   }
 
   componentDidMount() {
+    this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
+    this.unsCheckMate = this.refs.board1.on(ChessBoard.Events.CHECK_MATE, (data) => alert(data))
     this.setState({flipped: this.refs.board1.state.flipped})
   }
 
+  componentWillUnmount() {
+    console.log("Will unmount.")
+    this.unsMove()
+    this.unsCheckMate()
+  }
+  
   render() {
     let board1
     let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
@@ -88,8 +96,8 @@ export default class BoardPage2 extends Component {
                   <button className="btn" onClick={() => this.refs.board1.next()} title="Go to next position">&nbsp;&nbsp;&gt;</button>
                   <button className="btn" onClick={() => this.refs.board1.last()} title="Go to last position">&gt;&gt;</button>
                   <button className="btn" disabled={false} onClick={() => this.refs.board1.takeback()} title="Undo last move">Undo</button>
-                  <button className="btn wide" onClick={() => this.refs.board1.flip()} title="Flip/unflip board">
-                    Flip/Unflip
+                  <button className="btn wide" onClick={() => {this.refs.board1.flip(); this.setState({flipped: !this.state.flipped})}} title="Flip/Unflip the board">
+                    {(this && this.state) ? (this.state.flipped ? "UnFlip" : "Flip") : "Flip"}
                   </button>
               </div>
               <div className="row" style={{backgroundColor: '#dfdfdf', 
