@@ -1,8 +1,9 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
   "main": "components/board.js",
+  "keywords": ["chess", "react", "nextjs", "chess-board", "chessboard", "babel", "universal-app"],
   "scripts": {
     "dev": "next",
     "build": "next build",
