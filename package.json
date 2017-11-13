@@ -1,12 +1,12 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
-  "main": "components/board.js",
+  "main": "lib/board.js",
   "keywords": ["chess", "react", "nextjs", "chess-board", "chessboard", "babel", "universal-app"],
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "next build && cp .next/dist/components/board.js lib/board.js",
     "start": "next start"
   },
   "dependencies": {

@@ -195,7 +195,6 @@ export default class ChessBoard extends Component {
       CHECK: "CHECK",
       STALE_MATE: "STALE_MATE",
       MOVE: "MOVE"
-      
     }
     
     on = (evt, cb) => {
