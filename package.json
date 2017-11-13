@@ -1,13 +1,14 @@
 {
-  "version": "0.1.3",
+  "version": "0.1.5",
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
   "main": "lib/board.js",
   "keywords": ["chess", "react", "nextjs", "chess-board", "chessboard", "babel", "universal-app"],
   "scripts": {
     "dev": "next",
-    "build": "next build && cp .next/dist/components/board.js lib/board.js",
-    "start": "next start"
+    "build": "next build",
+    "start": "next start",
+    "prepublish": "next build && cp .next/dist/components/board.js lib/board.js"
   },
   "dependencies": {
     "chess.js": "https://github.com/sandy98/chess.js",

@@ -625,7 +625,7 @@ export default class ChessBoard extends Component {
                     key={i}
                   >
                     <img
-                      src={`/static/img/sets/${this.state.chessSet}/${ letter2img[figure] }`}
+                      src={chessSets[this.state.chessSet][figure]}
                       style={{
                         width: '100%',
                         height: '100%',
