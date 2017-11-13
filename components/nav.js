@@ -2,8 +2,7 @@ import Head from './head'
 import Link from 'next/link'
 
 const links = [
-  {href: '/boardpage1', label: 'Free Movements Board'},
-  {href: '/boardpage2', label: 'Controlled Board'},
+  {href: '/about', label: 'About'},
   { href: 'https://github.com/sandy98/next-chess-board', label: 'Fork me at Github' }
 ].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`

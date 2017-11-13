@@ -3,7 +3,15 @@
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
   "main": "lib/board.js",
-  "keywords": ["chess", "react", "nextjs", "chess-board", "chessboard", "babel", "universal-app"],
+  "keywords": [
+    "chess",
+    "react",
+    "nextjs",
+    "chess-board",
+    "chessboard",
+    "babel",
+    "universal-app"
+  ],
   "scripts": {
     "dev": "next",
     "build": "next build",
@@ -13,6 +21,7 @@
   "dependencies": {
     "chess.js": "https://github.com/sandy98/chess.js",
     "isomorphic-fetch": "^2.2.1",
+    "material-ui": "^0.19.4",
     "next": "^4.1.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
