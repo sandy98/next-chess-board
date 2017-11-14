@@ -323,8 +323,15 @@ export default class ChessBoard extends Component {
     takeback = () => {
       if (this.state.positions.length === 1) return false
       if (this.props.moveValidator) this.game.undo()
-      let posics = this.state.positions.slice(0, this.state.positions.length - 1)
-      this.setState({positions: posics, currentPosition: posics.length - 1})
+      let posics = this.props.moveValidator ?
+                     this.game.fens() : 
+                     this.state.positions.slice(0, this.state.positions.length - 1)
+      this.setState({positions: posics, 
+                     currentPosition: posics.length - 1,
+                     movements: this.props.moveValidator ? 
+                                  this.game.history() : 
+                                  this.state.movements.slice(0, this.state.movements.length - 1)
+                    })
       return true
     }
 
@@ -387,9 +394,15 @@ export default class ChessBoard extends Component {
     }
 
     getPgnText = () => {
-      // return (<h2>Viva Perón!</h2>)
       if (!this.props.moveValidator || !this.game) return ''
-      //return this.game.pgn().replace(/\]\[/g, ']\n[').replace(/\]\s*1/g, ']\n1')
+      let annotations = document.getElementsByClassName('annotation')
+      let annotation = annotations ? annotations[0] : null
+      let hei = annotation ? annotation.scrollHeight : 200
+      console.log("Scroll height: ", hei)
+      if (annotations && annotations.forEach) {
+        annotations.forEach((a) => a.scrollTop = hei)
+      }
+      if (annotation) annotation.scrollTop = hei
       let headers = this.game ? this.game.header() : {}
       let hkeys = []
       for (let k in headers) hkeys.push(k)
@@ -401,7 +414,7 @@ export default class ChessBoard extends Component {
             cursor: 'pointer',
             backgroundColor: (ind + 1) === this.state.currentPosition ? this.state.lightSqsBg : 'white' 
           }}
-          title={ind + 1}
+          title=""
           onClick={(e) => this.goto(ind + 1)}
         >
           {this.state.positions[ind] && (this.state.positions[ind].split(/\s+/)[1] === 'w')  ?
@@ -409,7 +422,7 @@ export default class ChessBoard extends Component {
             ''}{san}&nbsp;
         </span>
       ))
-      return (<div>
+      return (<div ref="annotation" className="annotation">
                 {hheaders}
                 <p style={{margin: '1pt'}}>
                   <span key={0}
