@@ -164,7 +164,10 @@ const defaultSettings = {
   selectedSqBg: selectedSqBg,
   movements:  [],
   isCrowning: false,
-  showNotation: true
+  showNotation: true,
+  whitePlayer: 'White Player',
+  blackPlayer: 'Black Player',
+  lang: 'en'
 }
 
 //
@@ -188,9 +191,6 @@ const letter2img = {p: 'p.png', P: 'pw.png',
                      r: 'r.png', R: 'rw.png',
                      q: 'q.png', Q: 'qw.png',
                      k: 'k.png', K: 'kw.png'}
-
-
-//
 
 export default class ChessBoard extends Component {
     
@@ -247,6 +247,9 @@ export default class ChessBoard extends Component {
         darkSqsBg: this.props.darkSqsBg || defaultSettings.darkSqsBg,
         selectedSqBg: this.props.selectedSqBg || defaultSettings.selectedSqBg,
         showNotation: this.props.showNotation || defaultSettings.showNotation,
+        whitePlayer: this.props.whitePlayer || defaultSettings.whitePlayer,
+        blackPlayer: this.props.blackPlayer || defaultSettings.blackPlayer,
+        gameDate: new Date().toLocaleDateString(),
         selectedSq: -1,
         isDragging: false,
         isCrowning: false,
@@ -260,12 +263,13 @@ export default class ChessBoard extends Component {
 
     useSquares = (n) => this.setState({lightSqsBg: lightSqBgs[n], darkSqsBg: darkSqBgs[n]})
 
+
     goto = (n) => {
       let n1
       if (n >= this.state.positions.length) {n1 = this.state.positions.length - 1}
       else if (n < 0) {n1 = 0}
       else {n1 = n}
-      this.setState({currentPosition: n1, pgnText: this.getPgnText()})
+      this.setState({currentPosition: n1})
     }
 
     previous = () => this.goto(this.state.currentPosition - 1)
@@ -278,24 +282,32 @@ export default class ChessBoard extends Component {
         this.game.load(emptyFen)
       }
       this.setState({positions: [emptyFen],
-        currentPosition: 0, movements: [], pgnText: this.getPgnText()})
+        currentPosition: 0, movements: []})
+    }
+
+    setBaseHeaders = () => {
+      if (!this.props.moveValidator) return
+      this.game.header('White', this.state.whitePlayer, 
+                       'Black', this.state.blackPlayer,
+                       'Date', this.state.gameDate)
     }
 
     reset = () => {
       if (this.props.moveValidator) {
         this.game.reset()
-        // console.log(`Reset: ${this.game.fen()}`)
+        this.setBaseHeaders()
       } 
       this.setState({positions: [defaultFen],
-                     currentPosition: 0, movements: [], pgnText: this.getPgnText()})
+                     currentPosition: 0, movements: []})
       return true
     }
 
     loadFen = (fen) => {
       if (this.props.moveValidator) {
         this.game.load(fen)
+        this.setBaseHeaders()
       }
-      this.setState({currentPosition: 0, positions: [fen], pgnText: this.getPgnText()})
+      this.setState({positions: [fen], currentPosition: 0, movemenst: []})
       return true
     }
 
@@ -303,7 +315,7 @@ export default class ChessBoard extends Component {
       if (!this.props.moveValidator) return false
       let isGood = this.game.load_pgn(pgn)
       if (isGood) {
-        this.setState({currentPosition: 0, positions: this.game.fens(), pgnText: this.getPgnText()})
+        this.setState({positions: this.game.fens(), currentPosition: 0, movemenst: this.game.history()})
       }
       return isGood
     }
@@ -312,7 +324,7 @@ export default class ChessBoard extends Component {
       if (this.state.positions.length === 1) return false
       if (this.props.moveValidator) this.game.undo()
       let posics = this.state.positions.slice(0, this.state.positions.length - 1)
-      this.setState({currentPosition: posics.length - 1, positions: posics, pgnText: this.getPgnText()})
+      this.setState({positions: posics, currentPosition: posics.length - 1})
       return true
     }
 
@@ -339,12 +351,26 @@ export default class ChessBoard extends Component {
     halfMoveClockCurrent = () => this.halfMoveClockFromPosition(this.state.positions.length - 1)
     moveNumberCurrent = () => this.moveNumberFromPosition(this.state.positions.length - 1)
     
+    setPlayer = (color, player) => {
+      if (color === 'w')
+        this.setState({whitePlayer: player})
+      else
+        this.setState({blackPlayer: player})
+      this.setBaseHeaders()
+    }
 
+    setDate = (date) => {
+      this.setState({gameDate: date.toLocaleDateString()})
+      this.setBaseHeaders()
+    }
+
+    
     componentDidMount() {
      //Waring! Delete next line in production!!!
      window.board1 = this
       if (this.props.moveValidator) {
       this.game = new Chess(this.state.positions[0])
+      this.setBaseHeaders()
       }
     }
 
@@ -355,24 +381,27 @@ export default class ChessBoard extends Component {
     setHeader = (k, v) => {
       if (!this.moveValidator) return
       this.game.header(k, v)
-      this.setState({pgnText: this.getPgnText()})
+      let obj = {}
+      obj[k] = v
+      this.setState(obj)
     }
 
     getPgnText = () => {
       // return (<h2>Viva Perón!</h2>)
-      if (!this.props.moveValidator) return 'PGN'
+      if (!this.props.moveValidator || !this.game) return ''
       //return this.game.pgn().replace(/\]\[/g, ']\n[').replace(/\]\s*1/g, ']\n1')
-      let headers = this.game.header()
+      let headers = this.game ? this.game.header() : {}
       let hkeys = []
       for (let k in headers) hkeys.push(k)
       let hheaders = hkeys.map((ky, i) => (<p style={{margin: '1pt'}} key={i}>[{ky} "{headers[ky]}"]</p>))
-      let sans = this.game.history()
+      let sans = this.game? this.game.history() : this.state.movements
       let decoSans = sans.map((san, ind) => (
         <span key={ind + 1} 
           style={{
             cursor: 'pointer',
-            backgroundColor: ind === this.state.currentPosition ? this.state.lightSqsBg : 'white' 
+            backgroundColor: (ind + 1) === this.state.currentPosition ? this.state.lightSqsBg : 'white' 
           }}
+          title={ind + 1}
           onClick={(e) => this.goto(ind + 1)}
         >
           {this.state.positions[ind] && (this.state.positions[ind].split(/\s+/)[1] === 'w')  ?
@@ -380,7 +409,20 @@ export default class ChessBoard extends Component {
             ''}{san}&nbsp;
         </span>
       ))
-      return (<div>{hheaders}<p style={{margin: '1pt'}}>{decoSans}</p></div>)
+      return (<div>
+                {hheaders}
+                <p style={{margin: '1pt'}}>
+                  <span key={0}
+                    style={{cursor: 'pointer', 
+                            backgroundColor: 0 === this.state.currentPosition ? this.state.lightSqsBg : 'white'
+                          }}
+                    onClick={(e) => this.goto(0)}
+                  >
+                    &nbsp;&nbsp;&nbsp;
+                  </span>
+                  {decoSans}
+                </p>
+              </div>)
     }
 
     getCrowning = (sqFrom, sqTo, fig) => {
@@ -473,8 +515,7 @@ export default class ChessBoard extends Component {
 
           this.setState({currentPosition: newCurrentPos, 
                          positions: [...this.state.positions, this.game.fen()],
-                         movements: [...this.state.movements, san],
-                         pgnText: this.getPgnText()})
+                         movements: [...this.state.movements, san]})
 
           this.emit(ChessBoard.Events.MOVE, san) 
 
@@ -695,13 +736,15 @@ export default class ChessBoard extends Component {
             style={{
               border: 'solid 1px navy',
               borderTop: 'none',
-              width: `${this.state.size - 10}px`,
+              width: `${this.state.size}px`,
+              height: `${parseInt(this.state.size / 4)}px`,
+              overflow: 'auto',
               fontSize: '12pt'
               /* paddingLeft: '0.5em',
               paddingTop: '0.5em', */
             }}
           >
-            {this.state.pgnText}
+            {this.getPgnText()}
           </div>
         </div>
       )
