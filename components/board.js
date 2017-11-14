@@ -150,6 +150,9 @@ const emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
 const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 const sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
 
+const pgnTagLineRE = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
+const sanRE = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/
+
 const defaultSettings = {
   size: 400,
   flipped: false,
@@ -160,7 +163,8 @@ const defaultSettings = {
   darkSqsBg: darkSqBgs[0],
   selectedSqBg: selectedSqBg,
   movements:  [],
-  isCrowning: false
+  isCrowning: false,
+  showNotation: true
 }
 
 //
@@ -197,6 +201,28 @@ export default class ChessBoard extends Component {
       MOVE: "MOVE"
     }
     
+    static Messages = {
+      CHECK_MATE: {en: 'Checkmate', es: 'Jaque Mate'},
+      CHECK: {en: 'Check', es: 'Jaque'},
+      STALE_MATE: {en: 'Stalemate', es: 'Mate ahogado'},
+      INSUFFICIENT_MATERIAL: {en: 'Insufficient material', es: 'Material insuficiente'}
+    }
+
+    static Figurines = {
+      p: {codePoint: '0x265f',	html: '&#9823;'},
+      n: {codePoint: '0x265e',	html: '&#9822;'},
+      b: {codePoint: '0x265d',	html: '&#9821;'},
+      r: {codePoint: '0x265c',	html: '&#9820;'},
+      q: {codePoint: '0x265b',	html: '&#9819;'},
+      k: {codePoint: '0x265a',	html: '&#9818;'},
+      P: {codePoint: '0x2659',	html: '&#9817;'},
+      N: {codePoint: '0x2658',	html: '&#9816;'},
+      B: {codePoint: '0x2657',	html: '&#9815;'},
+      R: {codePoint: '0x2656',	html: '&#9814;'},
+      Q: {codePoint: '0x2655',	html: '&#9813;'},
+      K: {codePoint: '0x2654',	html: '&#9812;'}
+    }
+
     on = (evt, cb) => {
       let uuid = v4()
       this.subscribers = [...this.subscribers, {id: uuid, event: evt, callback: cb}]
@@ -220,6 +246,7 @@ export default class ChessBoard extends Component {
         lightSqsBg: this.props.lightSqsBg || defaultSettings.lightSqsBg,
         darkSqsBg: this.props.darkSqsBg || defaultSettings.darkSqsBg,
         selectedSqBg: this.props.selectedSqBg || defaultSettings.selectedSqBg,
+        showNotation: this.props.showNotation || defaultSettings.showNotation,
         selectedSq: -1,
         isDragging: false,
         isCrowning: false,
@@ -238,7 +265,7 @@ export default class ChessBoard extends Component {
       if (n >= this.state.positions.length) {n1 = this.state.positions.length - 1}
       else if (n < 0) {n1 = 0}
       else {n1 = n}
-      this.setState({currentPosition: n1})
+      this.setState({currentPosition: n1, pgnText: this.getPgnText()})
     }
 
     previous = () => this.goto(this.state.currentPosition - 1)
@@ -251,7 +278,7 @@ export default class ChessBoard extends Component {
         this.game.load(emptyFen)
       }
       this.setState({positions: [emptyFen],
-        currentPosition: 0, movements: []})
+        currentPosition: 0, movements: [], pgnText: this.getPgnText()})
     }
 
     reset = () => {
@@ -260,7 +287,7 @@ export default class ChessBoard extends Component {
         // console.log(`Reset: ${this.game.fen()}`)
       } 
       this.setState({positions: [defaultFen],
-                     currentPosition: 0, movements: []})
+                     currentPosition: 0, movements: [], pgnText: this.getPgnText()})
       return true
     }
 
@@ -268,7 +295,7 @@ export default class ChessBoard extends Component {
       if (this.props.moveValidator) {
         this.game.load(fen)
       }
-      this.setState({currentPosition: 0, positions: [fen]})
+      this.setState({currentPosition: 0, positions: [fen], pgnText: this.getPgnText()})
       return true
     }
 
@@ -276,7 +303,7 @@ export default class ChessBoard extends Component {
       if (!this.props.moveValidator) return false
       let isGood = this.game.load_pgn(pgn)
       if (isGood) {
-        this.setState({currentPosition: 0, positions: this.game.fens()})
+        this.setState({currentPosition: 0, positions: this.game.fens(), pgnText: this.getPgnText()})
       }
       return isGood
     }
@@ -285,8 +312,13 @@ export default class ChessBoard extends Component {
       if (this.state.positions.length === 1) return false
       if (this.props.moveValidator) this.game.undo()
       let posics = this.state.positions.slice(0, this.state.positions.length - 1)
-      this.setState({currentPosition: posics.length - 1, positions: posics})
+      this.setState({currentPosition: posics.length - 1, positions: posics, pgnText: this.getPgnText()})
       return true
+    }
+
+    san2fig = (san) => {
+      let csan = san.replace(/[NBRQK]/, (f) => this.game.turn() == 'w' ? f.toLowerCase() : f)
+      return csan.replace(/[NBRQKnbrqk]/, (l) => ChessBoard.Figurines[l].html)
     }
 
     isFlipped = () => this.state.flipped
@@ -309,12 +341,10 @@ export default class ChessBoard extends Component {
     
 
     componentDidMount() {
-      //this.reset()
-     //console.log("Mounted board!")
+     //Waring! Delete next line in production!!!
      window.board1 = this
       if (this.props.moveValidator) {
       this.game = new Chess(this.state.positions[0])
-      // console.log(`componentDidMount: ${this.game.fen()}`)
       }
     }
 
@@ -322,19 +352,38 @@ export default class ChessBoard extends Component {
       this.setState({flipped: !this.state.flipped})
     } 
 
+    setHeader = (k, v) => {
+      if (!this.moveValidator) return
+      this.game.header(k, v)
+      this.setState({pgnText: this.getPgnText()})
+    }
+
+    getPgnText = () => {
+      // return (<h2>Viva Perón!</h2>)
+      if (!this.props.moveValidator) return 'PGN'
+      //return this.game.pgn().replace(/\]\[/g, ']\n[').replace(/\]\s*1/g, ']\n1')
+      let headers = this.game.header()
+      let hkeys = []
+      for (let k in headers) hkeys.push(k)
+      let hheaders = hkeys.map((ky, i) => (<p style={{margin: '1pt'}} key={i}>[{ky} "{headers[ky]}"]</p>))
+      let sans = this.game.history()
+      let decoSans = sans.map((san, ind) => (
+        <span key={ind + 1} 
+          style={{
+            cursor: 'pointer',
+            backgroundColor: ind === this.state.currentPosition ? this.state.lightSqsBg : 'white' 
+          }}
+          onClick={(e) => this.goto(ind + 1)}
+        >
+          {this.state.positions[ind] && (this.state.positions[ind].split(/\s+/)[1] === 'w')  ?
+            `${this.state.positions[ind].split(/\s+/)[5]}. ` :
+            ''}{san}&nbsp;
+        </span>
+      ))
+      return (<div>{hheaders}<p style={{margin: '1pt'}}>{decoSans}</p></div>)
+    }
+
     getCrowning = (sqFrom, sqTo, fig) => {
-        /*
-        let crowned
-        while (!crowned) {
-          crowned = prompt("Choose promotion(Q, R, N, B)", "Q")
-        }
-        if (fig === 'p') {
-            return crowned.toLowerCase()
-        }
-        else {
-            return crowned.toUpperCase()
-        }
-        */
         this.crowningInfo = {sqFrom: sqFrom,
                              sqTo: sqTo,
                              figureFrom: fig,
@@ -343,15 +392,10 @@ export default class ChessBoard extends Component {
                              top: this.refs[sq2san(sqTo ^ 56)].offsetTop,
                              left: this.refs[sq2san(sqTo ^ 56)].offsetLeft,
                             }
-        // console.log(`crowningInfo:\n${this.crowningInfo}`)
         this.setState({isCrowning: true})
     }
 
     move = (sqFrom, sqTo, figure, crowning) => {
-      // console.log(`move(sqFrom=${sq2san(sqFrom ^ 56)}, sqTo=${sq2san(sqTo ^ 56)}, figure=${figure}}`)
-      /* if (this.state.isCrowning) {
-        return
-      } */
       if (this.state.currentPosition !== this.state.positions.length - 1) {return}
       if (this.whoMovesCurrent() !== figureColor(figure)) {return}
       if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
@@ -422,18 +466,25 @@ export default class ChessBoard extends Component {
         let move = this.game.move(params)
         if (move) {
           let newCurrentPos = this.state.positions.length
+          let sans = this.game.history()
+          let san = sans[sans.length - 1]
+          let moveNumber = this.state.positions[this.state.positions.length -1].split(/\s+/)[5]
+          let dots = this.game.turn() === 'b' ? '.' : '...'
+
           this.setState({currentPosition: newCurrentPos, 
                          positions: [...this.state.positions, this.game.fen()],
-                         movements: [...this.state.movements, move]})
-          
-          let history = this.game.history()
-          this.emit(ChessBoard.Events.MOVE, history[history.length - 1]) 
-          
+                         movements: [...this.state.movements, san],
+                         pgnText: this.getPgnText()})
+
+          this.emit(ChessBoard.Events.MOVE, san) 
+
+          if (this.game.in_check() && !this.game.in_checkmate()) {
+              console.log("Emitting CHECK")
+              this.emit(ChessBoard.Events.CHECK, `${moveNumber}${dots} ${san}`)              
+          }
+
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
-              let sans = this.game.history()
-              let san = sans[sans.length - 1]
-              let moveNumber = this.state.positions[this.state.positions.length -1].split(/\s+/)[5]
               let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}...`]
               this.emit(ChessBoard.Events.CHECK_MATE, `${dottedMoveNumber}${san} checkmate. ${result}`)
             }
@@ -580,63 +631,77 @@ export default class ChessBoard extends Component {
       )
 
       return (
-        <div 
-          style={{
-            width: `${this.state.size}px`,
-            height: `${this.state.size}px`,
-            border: 'solid 1px navy',
-            backgroundColor: '#333333',
-            opacity: this.state.isCrowning ? '0.8' : '1'
-          }}
-        > 
-          {rows}
-          <div ref="crowningPanel"
-               style={{width: this.state.size / 2,
-                       height: this.state.size / 8, 
-                       color: 'white',
-                       display: this.state.isCrowning ? 'block' : 'none',
-                       position: 'fixed',
-                       left: this.crowningInfo ? this.crowningInfo.left : 0,
-                       top:  this.crowningInfo ? this.crowningInfo.top : 0,
-                       zIndex: '100'
-                       }}
-          >
-            {['q', 'n', 'r', 'b'].map((f) => this.crowningInfo ? (this.crowningInfo.figColor === 'w' ? f.toUpperCase() : f) : f)
-                                .map((figure, i) => {
-                let wh = this.state.size / 8
-                let ref = `crowning_${figure}`
-                return (
-                  <div style={{
-                    display: 'inline-block',
-                    width: wh,
-                    height: wh,
-                    backgroundColor: this.crowningInfo ? 
-                                      (this.crowningInfo.sqColor === 'b' ?  this.state.darkSqsBg : this.state.lightSqsBg) : 
-                                      this.state.darkSqsBg
-                    }}
-                    onClick={e => {
-                      let {sqFrom, sqTo, figureFrom} = this.crowningInfo
-                      this.setState({isCrowning: false})
-                      // console.log(`figureFrom: ${figureFrom} - figure: ${figure}`)
-                      this.move(sqFrom, sqTo, figureFrom, figure)
-                    }}
-
-                    ref={ref}
-                    key={i}
-                  >
-                    <img
-                      src={chessSets[this.state.chessSet][figure]}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        cursor: 'pointer'
+        <div style={{display: 'inline-block'}}>
+          <div 
+            style={{
+              width: `${this.state.size}px`,
+              height: `${this.state.size}px`,
+              border: 'solid 1px navy',
+              backgroundColor: '#333333',
+              opacity: this.state.isCrowning ? '0.8' : '1'
+            }}
+          > 
+            {rows}
+            <div ref="crowningPanel"
+                style={{width: this.state.size / 2,
+                        height: this.state.size / 8, 
+                        color: 'white',
+                        display: this.state.isCrowning ? 'block' : 'none',
+                        position: 'fixed',
+                        left: this.crowningInfo ? this.crowningInfo.left : 0,
+                        top:  this.crowningInfo ? this.crowningInfo.top : 0,
+                        zIndex: '100'
+                        }}
+            >
+              {['q', 'n', 'r', 'b'].map((f) => this.crowningInfo ? (this.crowningInfo.figColor === 'w' ? f.toUpperCase() : f) : f)
+                                  .map((figure, i) => {
+                  let wh = this.state.size / 8
+                  let ref = `crowning_${figure}`
+                  return (
+                    <div style={{
+                      display: 'inline-block',
+                      width: wh,
+                      height: wh,
+                      backgroundColor: this.crowningInfo ? 
+                                        (this.crowningInfo.sqColor === 'b' ?  this.state.darkSqsBg : this.state.lightSqsBg) : 
+                                        this.state.darkSqsBg
                       }}
-                    />
-                  </div>
-                )
-              }
+                      onClick={e => {
+                        let {sqFrom, sqTo, figureFrom} = this.crowningInfo
+                        this.setState({isCrowning: false})
+                        // console.log(`figureFrom: ${figureFrom} - figure: ${figure}`)
+                        this.move(sqFrom, sqTo, figureFrom, figure)
+                      }}
 
-            )}
+                      ref={ref}
+                      key={i}
+                    >
+                      <img
+                        src={chessSets[this.state.chessSet][figure]}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          cursor: 'pointer'
+                        }}
+                      />
+                    </div>
+                  )
+                }
+
+              )}
+            </div>
+          </div>
+          <div
+            style={{
+              border: 'solid 1px navy',
+              borderTop: 'none',
+              width: `${this.state.size - 10}px`,
+              fontSize: '12pt'
+              /* paddingLeft: '0.5em',
+              paddingTop: '0.5em', */
+            }}
+          >
+            {this.state.pgnText}
           </div>
         </div>
       )

@@ -9,7 +9,7 @@ import Snackbar from 'material-ui/Snackbar'
 export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
-    this.state = {isCheckMate: false, checkMateMsg: ''}
+    this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0}
     //this.state.flipped = false
   }
 
@@ -17,16 +17,20 @@ export default class BoardPage2 extends Component {
     this.refs.selectBg.value = 1
     this.refs.board1.useSquares(1)
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
+    this.unsCheck = this.refs.board1.on(
+      ChessBoard.Events.CHECK, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
     this.unsCheckMate = this.refs.board1.on(
-      // ChessBoard.Events.CHECK_MATE, (data) => setTimeout(() => alert(data), 0))
-      ChessBoard.Events.CHECK_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data})) 
+      ChessBoard.Events.CHECK_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
     this.setState({flipped: this.refs.board1.state.flipped,
                    lang: navigator.language.slice(0, 2)})
+    //Warning! Delete next line in production!
+    window.page1 = this
   }
 
   componentWillUnmount() {
     console.log("Will unmount.")
     this.unsMove()
+    this.unsCheck()
     this.unsCheckMate()
   }
   
@@ -85,12 +89,11 @@ export default class BoardPage2 extends Component {
       <Head title="Test Chess Board - Controlled Movements" />
         <Nav>
           <Snackbar
-              bodystyle={{fontSize: '36px'}}
+              contentstyle={{fontSize: '36px'}}
               open={this.state.isNotifY}
               message={this.state.notifyMsg}
-              autoHideDuration={10000}
+              autoHideDuration={this.state.notifyLen}
               action="X"
-              onActionTouchTap={this.handleNotifyClose}
               onRequestClose={this.handleNotifyClose}
           />
             <div className="hero" style={{/*backgroundImage: 'url("static/img/monstruos.jpg")', 
