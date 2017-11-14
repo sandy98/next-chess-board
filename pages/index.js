@@ -9,6 +9,7 @@ import Snackbar from 'material-ui/Snackbar'
 export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
+    this.state = {isCheckMate: false, checkMateMsg: ''}
     //this.state.flipped = false
   }
 
@@ -17,8 +18,10 @@ export default class BoardPage2 extends Component {
     this.refs.board1.useSquares(1)
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
     this.unsCheckMate = this.refs.board1.on(
-      ChessBoard.Events.CHECK_MATE, (data) => setTimeout(() => alert(data), 0))
-    this.setState({flipped: this.refs.board1.state.flipped})
+      // ChessBoard.Events.CHECK_MATE, (data) => setTimeout(() => alert(data), 0))
+      ChessBoard.Events.CHECK_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data})) 
+    this.setState({flipped: this.refs.board1.state.flipped,
+                   lang: navigator.language.slice(0, 2)})
   }
 
   componentWillUnmount() {
@@ -27,6 +30,10 @@ export default class BoardPage2 extends Component {
     this.unsCheckMate()
   }
   
+  handleNotifyClose = () => {
+    this.setState({isNotifY: false})
+  }
+
   render() {
     let board1
     let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
@@ -76,8 +83,17 @@ export default class BoardPage2 extends Component {
       `}</style>
 
       <Head title="Test Chess Board - Controlled Movements" />
-      <Nav>
-          <div className="hero" style={{/*backgroundImage: 'url("static/img/monstruos.jpg")', 
+        <Nav>
+          <Snackbar
+              bodystyle={{fontSize: '36px'}}
+              open={this.state.isNotifY}
+              message={this.state.notifyMsg}
+              autoHideDuration={10000}
+              action="X"
+              onActionTouchTap={this.handleNotifyClose}
+              onRequestClose={this.handleNotifyClose}
+          />
+            <div className="hero" style={{/*backgroundImage: 'url("static/img/monstruos.jpg")', 
                                         backgoundSize: '800px 600px', 
                                         backgroundPosition: 'center', */
                                         marginLeft: '7%',
