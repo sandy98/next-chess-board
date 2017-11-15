@@ -23,7 +23,7 @@ export default class Index extends Component {
                 <ChessBoard size={160} flipped={true} selectedSqBg="yellow" moveValidator={true} />
         </div>
         <div className="hero">
-          <h2 className="title">React Chess Board v0.1.0</h2>
+          <h3 className="title">React Chess Board v0.2.2</h3>
           <p className="description">
             What are you waiting? Go to <Link href="/"><a>Board Page</a></Link>
           </p>
