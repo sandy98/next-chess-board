@@ -312,7 +312,7 @@ export default class ChessBoard extends Component {
         this.setBaseHeaders()
       }
       if (result) {
-        this.setState({positions: [fen], currentPosition: 0, movemenst: []})
+        this.setState({positions: [fen], currentPosition: 0, movements: []})
       }
       else {
         this.emit(ChessBoard.Events.ERROR, "Could not load FEN.")
@@ -328,7 +328,7 @@ export default class ChessBoard extends Component {
         let gameData = this.game.header()
         this.setState({positions: this.game.fens(), 
                        currentPosition: 0, 
-                       movemenst: this.game.history(),
+                       movements: this.game.history(),
                        whitePlayer: gameData.White,
                        blackPlayer: gameData.Black,
                        gameDate: gameData.Date,

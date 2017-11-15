@@ -95,7 +95,7 @@ export default class BoardPage2 extends Component {
 
       `}</style>
 
-      <Head title="Test Chess Board - Controlled Movements" />
+      <Head title="Test Chess Board" />
         <Nav>
           <Snackbar
               contentstyle={{fontSize: '36px'}}
@@ -113,7 +113,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.2</h6>                               
+            <h6 className="title">React Chess Board v0.2.3</h6>                               
             <div className="row">
                 <div className="card">
                   <ChessBoard id={v4()} size={528} moveValidator={true} ref="board1"/>
