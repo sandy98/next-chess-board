@@ -21,24 +21,30 @@ export default class BoardPage2 extends Component {
       ChessBoard.Events.CHECK, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
     this.unsCheckMate = this.refs.board1.on(
       ChessBoard.Events.CHECK_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
+    this.unsStaleMate = this.refs.board1.on(
+      ChessBoard.Events.STALE_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
+    this.unsInsufficient = this.refs.board1.on(
+      ChessBoard.Events.INSUFFICIENT_MATERIAL, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
     this.setState({flipped: this.refs.board1.state.flipped,
                    lang: navigator.language.slice(0, 2)})
     //Warning! Delete next line in production!
     window.page1 = this
   }
 
-  componentWillUnmount() {
+   componentWillUnmount() {
     console.log("Will unmount.")
     this.unsMove()
     this.unsCheck()
     this.unsCheckMate()
-  }
+    this.unsInsufficient()
+    this.unsStaleMate()
+   }
   
-  handleNotifyClose = () => {
+   handleNotifyClose = () => {
     this.setState({isNotifY: false})
-  }
+   }
 
-  render() {
+   render() {
     let board1
     let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
     return (
@@ -93,10 +99,9 @@ export default class BoardPage2 extends Component {
               open={this.state.isNotifY}
               message={this.state.notifyMsg}
               autoHideDuration={this.state.notifyLen}
-              action="X"
               onRequestClose={this.handleNotifyClose}
           />
-            <div className="hero" style={{/*backgroundImage: 'url("static/img/monstruos.jpg")', 
+          <div className="hero" style={{/*backgroundImage: 'url("static/img/monstruos.jpg")', 
                                         backgoundSize: '800px 600px', 
                                         backgroundPosition: 'center', */
                                         marginLeft: '7%',
@@ -105,48 +110,103 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-              <div className="row">
-                  <ChessBoard id={v4()} size={560} moveValidator={true} ref="board1"/>
-              </div>
-              <div className="row" style={{backgroundColor: '#eeeeee', 
-                                          border: 'solid 1px', 
+            <div className="row">
+                <div className="card">
+                  <ChessBoard id={v4()} size={528} moveValidator={true} ref="board1"/>
+                </div>
+                <div className="card" style={{backgroundColor: '#eeeeee', 
+                                          border: 'none', 
                                           borderBottom: 'none', 
-                                          padding: '10px', 
-                                          borderTopLeftRadius: '10px',
-                                          borderTopRightRadius: '10px',
-                                          marginBottom: 0}}>
-                  <button className="btn wide" onClick={() => this.refs.board1.reset()} title="Restart game">Restart Game</button>
-                  <button className="btn" onClick={() => this.refs.board1.first()} title="Go to beginning position">&lt;&lt;</button>
-                  <button className="btn" onClick={() => this.refs.board1.previous()} title="Go to previous position">&lt;&nbsp;&nbsp;</button>
-                  <button className="btn" onClick={() => this.refs.board1.next()} title="Go to next position">&nbsp;&nbsp;&gt;</button>
-                  <button className="btn" onClick={() => this.refs.board1.last()} title="Go to last position">&gt;&gt;</button>
-                  <button className="btn" disabled={false} onClick={() => this.refs.board1.takeback()} title="Undo last move">Undo</button>
-                  <button className="btn wide" onClick={() => {this.refs.board1.flip(); this.setState({flipped: !this.state.flipped})}} title="Flip/Unflip the board">
+                                          padding: '5px', 
+                                          borderRadius: '8px',
+                                          marginLeft: '10px'}}>
+                  <div className="row">
+                    <button className="btn wide" onClick={() => this.refs.board1.reset()} title="Restart game">Restart Game</button>
+                  </div>
+                  <div className="row">
+                    <button className="btn" onClick={() => this.refs.board1.first()} title="Go to beginning position">&lt;&lt;</button>
+                    <button className="btn" onClick={() => this.refs.board1.previous()} title="Go to previous position">&lt;&nbsp;&nbsp;</button>
+                    <button className="btn" onClick={() => this.refs.board1.next()} title="Go to next position">&nbsp;&nbsp;&gt;</button>
+                    <button className="btn" onClick={() => this.refs.board1.last()} title="Go to last position">&gt;&gt;</button>
+                  </div>
+                  <div className="row">
+                    <button className="btn" disabled={false} onClick={() => this.refs.board1.takeback()} title="Undo last move">Undo</button>
+                  </div>
+                  <div className="row">
+                    <button className="btn wide" onClick={() => {this.refs.board1.flip(); this.setState({flipped: !this.state.flipped})}} title="Flip/Unflip the board">
                     {(this && this.state) ? (this.state.flipped ? "UnFlip" : "Flip") : "Flip"}
-                  </button>
+                    </button>
+                  </div>
+                  <hr/>
+                  <div className="row">
+                    <p>
+                        <label style={{color: '#1676a2'}} htmlFor="scs">Select chess set:&nbsp;</label>
+                        <select id="scs" onChange={ev => this.refs.board1.useSet(ev.target.value)}>
+                          <option value="default">Default</option>
+                          {sets.map((set, i) => <option key={i} value={set.toLowerCase()}>{set}</option>)}
+                        </select>
+                    </p>
+                    <p>
+                        <label style={{color: '#1676a2'}} htmlFor="sqc">Select board colors:&nbsp;</label>
+                        <select ref="selectBg" id="sqc" onChange={ev => this.refs.board1.useSquares(ev.target.value)}>
+                          <option value={0}>Light blue</option>
+                          <option value={1}>Brown</option>
+                        </select>
+                    </p>
+                  </div>
+                  <hr/>
+                  <div className="row">
+                    <button 
+                      className="btn" 
+                      onClick={(e) => {
+                        this.refs.copypaste.value = this.refs.board1.game.pgn({newline_char: '\n'})
+                        this.refs.copypaste.select()
+                        document.execCommand('copy')
+                      }} 
+                      title="Copy game PGN to clipboard"
+                    >
+                      Copy Game
+                    </button>
+                    <button 
+                      className="btn" 
+                      onClick={(e) => {
+                        this.refs.copypaste.select()
+                        document.execCommand('paste')
+                        let isGood = this.refs.board1.loadPgn(this.refs.copypaste.value)
+                        if (!isGood) {
+                          this.setState({isNotifY: true, notifyMsg: "Couldn't load game data.", notifyLen: 5000})
+                          this.refs.board1.reset()
+                        }
+                        else {
+                          setTimeout(() =>
+                          this.setState({isNotifY: true, 
+                                         notifyMsg: `Game ${this.refs.board1.state.whitePlayer}
+                                                      - ${this.refs.board1.state.blackPlayer} 
+                                                        ${this.refs.board1.state.gameResult || ''} loaded`, 
+                                         notifyLen: 5000})
+                          ,0)
+                        }
+                        this.refs.copypaste.value = ''
+                      }} 
+                      title="Paste game from clipboard"
+                    >
+                      Paste Game
+                    </button>
+                  </div>
+                  <div className="row">
+                   <textarea 
+                     ref="copypaste"
+                     style={{
+                       width: '90%',
+                       marginLeft: '5%',
+                       height: '10em',
+                       overflow: 'auto'
+                     }} 
+                   />
+                  </div>
+                  <hr/>
               </div>
-              <div className="row" style={{backgroundColor: '#eeeeee',
-                                          border: 'solid 1px',
-                                          borderTop: 'none',
-                                          padding: '10px', 
-                                          borderBottomLeftRadius: '10px',
-                                          borderBottomRightRadius: '10px',
-                                          marginTop: 0}}>
-                  <span>
-                      <label style={{color: '#1676a2'}} htmlFor="scs">Select chess set:&nbsp;</label>
-                      <select id="scs" onChange={ev => this.refs.board1.useSet(ev.target.value)}>
-                        <option value="default">Default</option>
-                        {sets.map((set, i) => <option key={i} value={set.toLowerCase()}>{set}</option>)}
-                      </select>
-                  </span>
-                  <span>
-                      <label style={{color: '#1676a2'}} htmlFor="sqc">Select board colors:&nbsp;</label>
-                      <select ref="selectBg" id="sqc" onChange={ev => this.refs.board1.useSquares(ev.target.value)}>
-                        <option value={0}>Light blue</option>
-                        <option value={1}>Brown</option>
-                      </select>
-                  </span>
-              </div>
+            </div>
           </div>
       </Nav>
     </div>

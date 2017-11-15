@@ -197,7 +197,9 @@ export default class ChessBoard extends Component {
     static Events = {
       CHECK_MATE: "CHECK_MATE",
       CHECK: "CHECK",
+      DRAW: "DRAW",
       STALE_MATE: "STALE_MATE",
+      INSUFFICIENT_MATERIAL: "INSUFFICIENT_MATERIAL",
       MOVE: "MOVE"
     }
     
@@ -315,7 +317,14 @@ export default class ChessBoard extends Component {
       if (!this.props.moveValidator) return false
       let isGood = this.game.load_pgn(pgn)
       if (isGood) {
-        this.setState({positions: this.game.fens(), currentPosition: 0, movemenst: this.game.history()})
+        let gameData = this.game.header()
+        this.setState({positions: this.game.fens(), 
+                       currentPosition: 0, 
+                       movemenst: this.game.history(),
+                       whitePlayer: gameData.White,
+                       blackPlayer: gameData.Black,
+                       gameDate: gameData.Date,
+                       gameResult: gameData.Result})
       }
       return isGood
     }
@@ -540,10 +549,21 @@ export default class ChessBoard extends Component {
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
               let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}...`]
+              this.game.header('Result', result)
+              this.setState({gameResult: result})
               this.emit(ChessBoard.Events.CHECK_MATE, `${dottedMoveNumber}${san} checkmate. ${result}`)
             }
             else if (this.game.in_draw()) {
-              setTimeout(() => alert(`Game over. It's a draw. 1/2-1/2`), 100)
+              if (this.game.insufficient_material() || this.game.in_stalemate()) {
+                this.game.header('Result', '1/2-1/2')
+                this.setState({gameResult: '1/2-1/2'})
+                if (this.game.in_stalemate()) {
+                  this.emit(ChessBoard.Events.STALE_MATE, `Draw 1/2-1/2 stalemate`)
+                }
+                else {
+                  this.emit(ChessBoard.Events.INSUFFICIENT_MATERIAL, `Draw 1/2-1/2 insufficient material`)
+                }
+              }
             }
           }
         }
