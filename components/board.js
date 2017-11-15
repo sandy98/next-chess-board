@@ -19,7 +19,6 @@ arr.length > 0 ? partition(arr.slice(n), n, [...r, arr.slice(0, n)]) : r
 const unflippedRows = [range(56), range(48), range(40), range(32), range(24), range(16), range(8), range()]
 const flippedRows = [range(7, -1), range(15, 7), range(23, 15), range(31, 23), 
                      range(39, 31), range(47, 39), range(55, 47), range(63, 55)]
-
 */
 
 const chessSets = {
@@ -184,6 +183,7 @@ const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((
 const sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
 const san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
 const figureColor = (figure) => figure ? figure === figure.toLowerCase() ? 'b' : 'w' : '-'
+const date2pgn = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 
 const letter2img = {p: 'p.png', P: 'pw.png', 
                      n: 'n.png', N: 'nw.png', 
@@ -200,7 +200,8 @@ export default class ChessBoard extends Component {
       DRAW: "DRAW",
       STALE_MATE: "STALE_MATE",
       INSUFFICIENT_MATERIAL: "INSUFFICIENT_MATERIAL",
-      MOVE: "MOVE"
+      MOVE: "MOVE",
+      ERROR: "ERROR"
     }
     
     static Messages = {
@@ -251,7 +252,7 @@ export default class ChessBoard extends Component {
         showNotation: this.props.showNotation || defaultSettings.showNotation,
         whitePlayer: this.props.whitePlayer || defaultSettings.whitePlayer,
         blackPlayer: this.props.blackPlayer || defaultSettings.blackPlayer,
-        gameDate: new Date().toLocaleDateString(),
+        gameDate: date2pgn(new Date()),
         selectedSq: -1,
         isDragging: false,
         isCrowning: false,
@@ -305,12 +306,19 @@ export default class ChessBoard extends Component {
     }
 
     loadFen = (fen) => {
+      let result = true
       if (this.props.moveValidator) {
-        this.game.load(fen)
+        result = this.game.load(fen)
         this.setBaseHeaders()
       }
-      this.setState({positions: [fen], currentPosition: 0, movemenst: []})
-      return true
+      if (result) {
+        this.setState({positions: [fen], currentPosition: 0, movemenst: []})
+      }
+      else {
+        this.emit(ChessBoard.Events.ERROR, "Could not load FEN.")
+      }
+        
+      return result
     }
 
     loadPgn = (pgn) => {
@@ -376,7 +384,7 @@ export default class ChessBoard extends Component {
     }
 
     setDate = (date) => {
-      this.setState({gameDate: date.toLocaleDateString()})
+      this.setState({gameDate: date2pgn(date)})
       this.setBaseHeaders()
     }
 
@@ -407,7 +415,7 @@ export default class ChessBoard extends Component {
       let annotations = document.getElementsByClassName('annotation')
       let annotation = annotations ? annotations[0] : null
       let hei = annotation ? annotation.scrollHeight : 200
-      console.log("Scroll height: ", hei)
+      //console.log("Scroll height: ", hei)
       if (annotations && annotations.forEach) {
         annotations.forEach((a) => a.scrollTop = hei)
       }
@@ -428,7 +436,7 @@ export default class ChessBoard extends Component {
         >
           {this.state.positions[ind] && (this.state.positions[ind].split(/\s+/)[1] === 'w')  ?
             `${this.state.positions[ind].split(/\s+/)[5]}. ` :
-            ''}{san}&nbsp;
+            ind === 0 ? `${this.state.positions[ind].split(/\s+/)[5]}. ... ` : ''}{san}&nbsp;
         </span>
       ))
       return (<div ref="annotation" className="annotation">
@@ -526,14 +534,14 @@ export default class ChessBoard extends Component {
       else {
         let params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
         params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
-        console.log(`Game move params: from: ${params.from}, to: ${params['to']}, promotion: ${params.promotion}`)
+        //console.log(`Game move params: from: ${params.from}, to: ${params['to']}, promotion: ${params.promotion}`)
         let move = this.game.move(params)
         if (move) {
           let newCurrentPos = this.state.positions.length
           let sans = this.game.history()
           let san = sans[sans.length - 1]
           let moveNumber = this.state.positions[this.state.positions.length -1].split(/\s+/)[5]
-          let dots = this.game.turn() === 'b' ? '.' : '...'
+          let dots = this.game.turn() === 'b' ? '.' : '. ...'
 
           this.setState({currentPosition: newCurrentPos, 
                          positions: [...this.state.positions, this.game.fen()],
@@ -542,13 +550,13 @@ export default class ChessBoard extends Component {
           this.emit(ChessBoard.Events.MOVE, san) 
 
           if (this.game.in_check() && !this.game.in_checkmate()) {
-              console.log("Emitting CHECK")
+              //console.log("Emitting CHECK")
               this.emit(ChessBoard.Events.CHECK, `${moveNumber}${dots} ${san}`)              
           }
 
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
-              let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}...`]
+              let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}. ...`]
               this.game.header('Result', result)
               this.setState({gameResult: result})
               this.emit(ChessBoard.Events.CHECK_MATE, `${dottedMoveNumber}${san} checkmate. ${result}`)

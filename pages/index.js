@@ -25,6 +25,8 @@ export default class BoardPage2 extends Component {
       ChessBoard.Events.STALE_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
     this.unsInsufficient = this.refs.board1.on(
       ChessBoard.Events.INSUFFICIENT_MATERIAL, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
+    this.unsError = this.refs.board1.on(
+      ChessBoard.Events.ERROR, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
     this.setState({flipped: this.refs.board1.state.flipped,
                    lang: navigator.language.slice(0, 2)})
     //Warning! Delete next line in production!
@@ -38,6 +40,7 @@ export default class BoardPage2 extends Component {
     this.unsCheckMate()
     this.unsInsufficient()
     this.unsStaleMate()
+    this.unsError()
    }
   
    handleNotifyClose = () => {
@@ -199,7 +202,44 @@ export default class BoardPage2 extends Component {
                      style={{
                        width: '90%',
                        marginLeft: '5%',
-                       height: '10em',
+                       height: '5em',
+                       overflow: 'auto'
+                     }} 
+                   />
+                  </div>
+                  <hr/>
+                  <div className="row">
+                    <button 
+                      className="btn" 
+                      onClick={(e) => {
+                        this.refs.copypasteFen.value = 
+                          this.refs.board1.state.positions[this.refs.board1.state.currentPosition]
+                        this.refs.copypasteFen.select()
+                        document.execCommand('copy')
+                      }} 
+                      title="Copy game FEN to clipboard"
+                    >
+                      Copy FEN
+                    </button>
+                    <button 
+                      className="btn" 
+                      onClick={(e) => {
+                        this.refs.copypasteFen.select()
+                        document.execCommand('paste')
+                        let result = this.refs.board1.loadFen(this.refs.copypasteFen.value)
+                        if (result) this.refs.copypasteFen.value = ''
+                      }} 
+                      title="Paste FEN from clipboard"
+                    >
+                      Paste FEN
+                    </button>
+                  </div>
+                  <div className="row">
+                   <input type="text" 
+                     ref="copypasteFen"
+                     style={{
+                       width: '90%',
+                       marginLeft: '5%',
                        overflow: 'auto'
                      }} 
                    />
