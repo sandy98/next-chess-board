@@ -32,6 +32,9 @@ export default class BoardPage2 extends Component {
   componentDidMount() {
     this.refs.selectBg.value = 1
     this.refs.board1.useSquares(1)
+    this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, (pos) => {
+      console.log(`Received CHANGE to pos ${pos}`)
+      this.refs.board1.doScroll()})
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
     this.unsCheck = this.refs.board1.on(
       ChessBoard.Events.CHECK, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
@@ -45,12 +48,14 @@ export default class BoardPage2 extends Component {
       ChessBoard.Events.ERROR, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
     this.setState({flipped: this.refs.board1.state.flipped,
                    lang: navigator.language.slice(0, 2)})
+    this.refs.board1.setSize(parseInt(screen.availWidth / 3.4))
     //Warning! Delete next line in production!
     window.page1 = this
   }
 
    componentWillUnmount() {
     console.log("Will unmount.")
+    this.unsChange()
     this.unsMove()
     this.unsCheck()
     this.unsCheckMate()
@@ -110,9 +115,9 @@ export default class BoardPage2 extends Component {
         }
         
         .card {
-		background-color: #eeeeee;
-                width: 360px;
-                min-width: 360px; 
+		            background-color: #eeeeee;
+                width: 50%;
+                min-width: 50%; 
                 border: none; 
                 padding: 5px; 
                 border-radius: 10px;
@@ -140,7 +145,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.5</h6>                               
+            <h6 className="title">React Chess Board v0.2.6</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard id={v4()} size={360} moveValidator={true} ref="board1"/>

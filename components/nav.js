@@ -2,7 +2,7 @@ import Head from './head'
 import Link from 'next/link'
 
 const links = [
-  {href: '/static/borges.txt', label: 'Jorge Luis Borges on Chess'},
+  {href: '/borges', label: 'Jorge Luis Borges on Chess'},
   {href: '/about', label: 'About'},
   { href: 'https://github.com/sandy98/next-chess-board', label: 'Fork me at Github' }
 ].map(link => {

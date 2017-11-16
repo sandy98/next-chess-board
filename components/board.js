@@ -137,8 +137,8 @@ const partPosition = (pos) => partition([...pos]).map(r => r.join('')).join('/')
 const compressPosition = (pos) => partPosition(pos).replace(/0+/g, (m => m.length.toString()))
 const expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => range(0, parseInt(d)).map(i => '0').join(''))
 
-const lightSqBgs = ['#ADD8E6', '#f0d9b5', '#dfdfdf']
-const darkSqBgs = ['#6495ED', '#b58863', '#56b6e2']
+const lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf']
+const darkSqBgs = ['#6495ed', '#b58863', '#56b6e2']
 const selectedSqBg = '#bfd'
 
 const emptyPosition = range(0, 64).map(i =>'0').join('')
@@ -201,7 +201,8 @@ export default class ChessBoard extends Component {
       STALE_MATE: "STALE_MATE",
       INSUFFICIENT_MATERIAL: "INSUFFICIENT_MATERIAL",
       MOVE: "MOVE",
-      ERROR: "ERROR"
+      ERROR: "ERROR",
+      CHANGE: "CHANGE"
     }
     
     static Messages = {
@@ -262,6 +263,8 @@ export default class ChessBoard extends Component {
       this.moveValidator = props.moveValidator || null
     }
 
+    doScroll = () => this.refs.notation.scrollTop = this.refs.notation.scrollHeight
+
     useSet = (set) => this.setState({chessSet: set})
 
     useSquares = (n) => this.setState({lightSqsBg: lightSqBgs[n], darkSqsBg: darkSqBgs[n]})
@@ -273,6 +276,7 @@ export default class ChessBoard extends Component {
       else if (n < 0) {n1 = 0}
       else {n1 = n}
       this.setState({currentPosition: n1})
+      this.emit(ChessBoard.Events.CHANGE, n1) 
     }
 
     previous = () => this.goto(this.state.currentPosition - 1)
@@ -288,6 +292,12 @@ export default class ChessBoard extends Component {
         currentPosition: 0, movements: []})
     }
 
+    resetBaseHeaders = () => {
+      this.setState({whitePlayer: this.props.whitePlayer || defaultSettings.whitePlayer,
+                     blackPlayer: this.props.blackPlayer || defaultSettings.blackPlayer,
+                    gameDate: date2pgn(new Date())})
+    }
+
     setBaseHeaders = () => {
       if (!this.props.moveValidator) return
       this.game.header('White', this.state.whitePlayer, 
@@ -296,6 +306,7 @@ export default class ChessBoard extends Component {
     }
 
     reset = () => {
+      this.resetBaseHeaders()
       if (this.props.moveValidator) {
         this.game.reset()
         this.setBaseHeaders()
@@ -309,10 +320,12 @@ export default class ChessBoard extends Component {
       let result = true
       if (this.props.moveValidator) {
         result = this.game.load(fen)
-        this.setBaseHeaders()
       }
       if (result) {
         this.setState({positions: [fen], currentPosition: 0, movements: []})
+        this.resetBaseHeaders()
+        this.setBaseHeaders()
+        this.emit(ChessBoard.Events.CHANGE, 0)
       }
       else {
         this.emit(ChessBoard.Events.ERROR, "Could not load FEN.")
@@ -333,6 +346,7 @@ export default class ChessBoard extends Component {
                        blackPlayer: gameData.Black,
                        gameDate: gameData.Date,
                        gameResult: gameData.Result})
+        this.emit(ChessBoard.Events.CHANGE, 0)  
       }
       return isGood
     }
@@ -349,6 +363,7 @@ export default class ChessBoard extends Component {
                                   this.game.history() : 
                                   this.state.movements.slice(0, this.state.movements.length - 1)
                     })
+      this.emit(ChessBoard.Events.CHANGE, posics.length - 1)
       return true
     }
 
@@ -376,10 +391,12 @@ export default class ChessBoard extends Component {
     moveNumberCurrent = () => this.moveNumberFromPosition(this.state.positions.length - 1)
     
     setPlayer = (color, player) => {
-      if (color === 'w')
+      if (color === 'w') {
         this.setState({whitePlayer: player})
-      else
+      }
+      else {
         this.setState({blackPlayer: player})
+      }
       this.setBaseHeaders()
     }
 
@@ -388,6 +405,9 @@ export default class ChessBoard extends Component {
       this.setBaseHeaders()
     }
 
+    setSize = (newSize) => {
+      this.setState({size: newSize})
+    }
     
     componentDidMount() {
      //Waring! Delete next line in production!!!
@@ -403,7 +423,7 @@ export default class ChessBoard extends Component {
     } 
 
     setHeader = (k, v) => {
-      if (!this.moveValidator) return
+      if (!this.props.moveValidator) return
       this.game.header(k, v)
       let obj = {}
       obj[k] = v
@@ -530,23 +550,27 @@ export default class ChessBoard extends Component {
            positions: [...this.state.positions, [newComprPos, newWhoMoves, newCastling, 
                        newEnPassant, newHalfMoveClock, newMoveNumber].join(' ')],
                       movements: [...this.state.movements, {sqFrom, sqTo, figure: oldFigure, crowning}]})
-      }
+      this.emit(ChessBoard.Events.CHANGE, newCurrPos) 
+      this.emit(ChessBoard.Events.MOVE, this.state.movements[this.state.movements.length -1])} 
       else {
         let params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
         params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
         //console.log(`Game move params: from: ${params.from}, to: ${params['to']}, promotion: ${params.promotion}`)
         let move = this.game.move(params)
         if (move) {
-          let newCurrentPos = this.state.positions.length
+          let newCurrentPos = this.game.fens().length -1
           let sans = this.game.history()
           let san = sans[sans.length - 1]
           let moveNumber = this.state.positions[this.state.positions.length -1].split(/\s+/)[5]
           let dots = this.game.turn() === 'b' ? '.' : '. ...'
 
           this.setState({currentPosition: newCurrentPos, 
-                         positions: [...this.state.positions, this.game.fen()],
-                         movements: [...this.state.movements, san]})
+//                         positions: [...this.state.positions, this.game.fen()],
+//                         movements: [...this.state.movements, san]})
+                         positions: this.game.fens(),
+                         movements: this.game.history()})
 
+          this.emit(ChessBoard.Events.CHANGE, newCurrentPos)
           this.emit(ChessBoard.Events.MOVE, san) 
 
           if (this.game.in_check() && !this.game.in_checkmate()) {
@@ -713,7 +737,7 @@ export default class ChessBoard extends Component {
       )
 
       return (
-        <div style={{display: 'inline-block'}}>
+        <div style={{display: 'inline-block'}} onDoubleClick={() => this.flip()}>
           <div 
             style={{
               width: `${this.state.size}px`,
@@ -774,7 +798,9 @@ export default class ChessBoard extends Component {
             </div>
           </div>
           <div
+            ref="notation"
             style={{
+              display: this.props.hideNotation || !this.props.moveValidator ? 'none' : 'inherit',
               border: 'solid 1px navy',
               borderTop: 'none',
               width: `${this.state.size}px`,

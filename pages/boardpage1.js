@@ -54,7 +54,7 @@ export default () => {
     
     <Head title="Test Chess Board - Free Movements" />
     <Nav>
-        <div className="hero" style={{backgroundImage: `url(${solDragon})`,
+        <div className="hero" style={{backgroundImage: `url(/static/img/sol-dragon.jpeg)`,
                                       backgroundPosition: '32%', 
                                       backgoundSize: '800px 600px',
                                       marginLeft: '7%',
