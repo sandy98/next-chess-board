@@ -7,7 +7,7 @@ import 'isomorphic-fetch'
 import ChessBoard from '../components/board'
 
 
-export default class Index extends Component {
+export default class About extends Component {
   static async getInitialProps() {
     const text = await fetch('https://raw.githubusercontent.com/sandy98/next-chess-board/master/README.md')
     const readme = await text.text()
@@ -23,7 +23,7 @@ export default class Index extends Component {
                 <ChessBoard size={160} flipped={true} selectedSqBg="yellow" moveValidator={true} />
         </div>
         <div className="hero">
-          <h3 className="title">React Chess Board v0.2.3</h3>
+          <h3 className="title">React Chess Board v0.2.4</h3>
           <p className="description">
             What are you waiting? Go to <Link href="/"><a>Board Page</a></Link>
           </p>

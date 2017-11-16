@@ -1,4 +1,5 @@
 import {Component} from 'react'
+import fetch from 'isomorphic-fetch'
 import {v4} from 'uuid'
 import Link from 'next/link'
 import Head from '../components/head'
@@ -13,6 +14,21 @@ export default class BoardPage2 extends Component {
     //this.state.flipped = false
   }
 
+  static async getInitialProps() {
+    try {
+      const pgnfile = await fetch('https://chessboard.now.sh/static/pgn/quickmates.pgn')
+      const pgntext = await pgnfile.text()
+      const pgngames = pgntext.split(/[\n\r]{2}(?=\[)/)
+      const jsonfile = await fetch('https://chessboard.now.sh/static/json/quickmates.json')
+      const jsongames = await jsonfile.json()
+      console.log(`Json games: ${jsongames.length}   -   Pgn games: ${pgngames.length}`)    
+      return {pgngames, jsongames}
+    }
+    catch (e) {
+      return {pgngames: [], jsongames: []}
+    }
+  }
+  
   componentDidMount() {
     this.refs.selectBg.value = 1
     this.refs.board1.useSquares(1)
@@ -92,7 +108,18 @@ export default class BoardPage2 extends Component {
           background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
           text-decoration: none;
         }
-
+        
+        .card {
+		background-color: #eeeeee;
+                width: 528px;
+                min-width: 528px; 
+                border: none;
+                border-bottom: none; 
+                padding: 5px; 
+                border-radius: 8px;
+                margin-left: 10px;      
+        }
+        
       `}</style>
 
       <Head title="Test Chess Board" />
@@ -118,12 +145,7 @@ export default class BoardPage2 extends Component {
                 <div className="card">
                   <ChessBoard id={v4()} size={528} moveValidator={true} ref="board1"/>
                 </div>
-                <div className="card" style={{backgroundColor: '#eeeeee', 
-                                          border: 'none', 
-                                          borderBottom: 'none', 
-                                          padding: '5px', 
-                                          borderRadius: '8px',
-                                          marginLeft: '10px'}}>
+                <div className="card">
                   <div className="row">
                     <button className="btn wide" onClick={() => this.refs.board1.reset()} title="Restart game">Restart Game</button>
                   </div>
@@ -159,6 +181,17 @@ export default class BoardPage2 extends Component {
                     </p>
                   </div>
                   <hr/>
+                  <div className="row">
+                   <textarea 
+                     ref="copypaste"
+                     style={{
+                       width: '90%',
+                       marginLeft: '5%',
+                       height: '5em',
+                       overflow: 'auto'
+                     }} 
+                   />
+                  </div>
                   <div className="row">
                     <button 
                       className="btn" 
@@ -197,18 +230,17 @@ export default class BoardPage2 extends Component {
                       Paste Game
                     </button>
                   </div>
+                  <hr/>
                   <div className="row">
-                   <textarea 
-                     ref="copypaste"
+                   <input type="text" 
+                     ref="copypasteFen"
                      style={{
                        width: '90%',
                        marginLeft: '5%',
-                       height: '5em',
                        overflow: 'auto'
                      }} 
                    />
                   </div>
-                  <hr/>
                   <div className="row">
                     <button 
                       className="btn" 
@@ -235,18 +267,39 @@ export default class BoardPage2 extends Component {
                       Paste FEN
                     </button>
                   </div>
-                  <div className="row">
-                   <input type="text" 
-                     ref="copypasteFen"
-                     style={{
-                       width: '90%',
-                       marginLeft: '5%',
-                       overflow: 'auto'
-                     }} 
-                   />
-                  </div>
                   <hr/>
+                  <div className="row">
+                    <label htmlFor="gamePick" style={{color: '#1676a2'}}>Pick a game</label>
+                    <select id="gamePick" style={{height: '2em', minHeight: '2em'}} onChange={(ev) => {
+                            if (ev.target.value < 0) return false
+                            let result = this.refs.board1.loadPgn(this.props.pgngames[ev.target.value])
+                            if (!result) {
+                              this.setState({isNotify: true, notifyMsg: 'Could not load selected game', notifyLen: 5000})
+                              }
+                            return result
+                            }}
+                     >
+                      <option value={-1}></option>
+                      {
+                        this.props.jsongames.map((jgame, i) => (
+                          <option key={i} value={i} 
+                          >
+                            {`${this.props.jsongames[i].headers.White} - 
+                              ${this.props.jsongames[i].headers.Black}   
+                              ${this.props.jsongames[i].headers.Result}`}
+                          </option>
+                          )
+                        )
+                      }
+                    </select>
+                  </div>
               </div>
+              <div className="card">
+                <div className="row">
+                  <h2>Analysis</h2>
+                </div>
+              </div>
+
             </div>
           </div>
       </Nav>

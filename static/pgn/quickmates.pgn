@@ -1,0 +1,642 @@
+[Event "NWC April"]
+[Site "NWC April"]
+[Date "1983.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Lance Darling"]
+[Black "Richard Wood"]
+[ECO "A00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "4"]
+
+1. g4 e6 2. f4 Qh4# 0-1
+
+[Event "Kiel"]
+[Site "Kiel"]
+[Date "1893.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Lindemann"]
+[Black "Echtermeyer"]
+[ECO "B01"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "6"]
+
+1.e4 d5 2.exd5 Qxd5 3.Ke2 Qe4# {The congress book indicates
+that Black did not mate immediately after white's third move,
+but preferred to play a bit with White before making the
+kill. No moves are supplied.} 0-1
+
+[Event "U.S. Open"]
+[Site "Omaha"]
+[Date "1959.??.??"]
+[EventDate "?"]
+[Round "12"]
+[Result "1-0"]
+[White "W E Mayfield"]
+[Black "William R Trinks"]
+[ECO "B00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "5"]
+
+1.e4 g5 2.Nc3 f5 3.Qh5# 1-0
+
+[Event "Stanislawow"]
+[Site "Stanislawow"]
+[Date "1902.??.??"]
+[EventDate "1902.??.??"]
+[Round "?"]
+[Result "0-1"]
+[White "B R"]
+[Black "Alexander Wagner"]
+[ECO "C33"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "10"]
+
+1. e4 e5 2. f4 exf4 3. Bc4 Qh4+ 4. Kf1 Bc5 5. Nf3 Qf2# 0-1
+
+[Event "Unknown"]
+[Site "Unknown"]
+[Date "1802.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "NN"]
+[Black "Du Mont"]
+[ECO "A02"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "12"]
+
+1. f4 e5 2. fxe5 d6 3. exd6 Bxd6 4. g3 Qg5 5. Nf3 Qxg3+
+6. hxg3 Bxg3# 0-1
+
+[Event "Koln"]
+[Site "Koln"]
+[Date "1912.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Muhlock"]
+[Black "Borislav Kostic"]
+[ECO "C50"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "14"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 4.Nxe5 Qg5 5.Nxf7 Qxg2 6.Rf1 Qxe4+
+7.Be2 Nf3# 0-1
+
+[Event "Paris"]
+[Site "Paris"]
+[Date "1925.??.??"]
+[EventDate "1925.??.??"]
+[Round "?"]
+[Result "0-1"]
+[White "N Tchinenoff"]
+[Black "R Maillard"]
+[ECO "C30"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "8"]
+
+1. e4 e5 2. f4 Bc5 3. fxe5 Qh4+ 4. Ke2 Qxe4# 0-1
+
+[Event "Dayton"]
+[Site "Dayton"]
+[Date "1979.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Tony Mantia"]
+[Black "T Trogdon"]
+[ECO "A18"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "12"]
+
+1. c4 Nf6 2. Nc3 e6 3. e4 Nc6 4. Nge2 b6 5. g3 Ne5 6. d4 Nf3#
+0-1
+
+[Event "cr NL 3361"]
+[Site "cr NL 3361"]
+[Date "1990.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Van Kessel"]
+[Black "Rensen"]
+[ECO "A03"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "6"]
+
+1.f4 d5 2.h3 e5 3.g4 Qh4# 0-1
+
+[Event "Dieren"]
+[Site "Dieren"]
+[Date "1990.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Hans Klip"]
+[Black "Tom Bottema"]
+[ECO "B00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "5"]
+
+1.e4 f6 2.d4 g5 3.Qh5# 1-0
+
+[Event "Dayton"]
+[Site "Dayton"]
+[Date "1981.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "J Spencer"]
+[Black "Takacs"]
+[ECO "A20"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "8"]
+
+1. c4 e5 2. b3 Bc5 3. Nc3 Qf6 4. Bb2 Qxf2# 0-1
+
+[Event "cr"]
+[Site "cr"]
+[Date "1979.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Molinari"]
+[Black "Bordais"]
+[ECO "B20"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "10"]
+
+1. e4 c5 2. c4 Nc6 3. Ne2 Nf6 4. Nbc3 Nb4 5. g3 Nd3# 0-1
+
+[Event "Dayton"]
+[Site "Dayton"]
+[Date "1969.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Barney"]
+[Black "Mccrum"]
+[ECO "A02"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "10"]
+
+1. f4 e5 2. fxe5 d6 3. exd6 Bxd6 4. Nf3 g5 5. h3 Bg3# 0-1
+
+[Event "Internet"]
+[Site "Internet"]
+[Date "1996.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Bill Wall"]
+[Black "Bridgemen"]
+[ECO "B00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "9"]
+
+1.e4 a5 2.Bc4 h5 3.Qf3 Nf6 4.e5 Ne4 5.Bxf7# 1-0
+
+[Event "Whitby BCF Major op"]
+[Site "ENG"]
+[Date "1962.??.??"]
+[EventDate "1962.08.??"]
+[Round "?"]
+[Result "1-0"]
+[White "Charles R Gurnhill"]
+[Black "W H Banks"]
+[ECO "B17"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "11"]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7 5. Qe2 Ngf6 6. Nd6#
+1-0
+
+[Event "Los Angeles"]
+[Site "Los Angeles"]
+[Date "1952.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "M Meyer"]
+[Black "D Newcomb"]
+[ECO "C23"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "13"]
+
+1. e4 e5 2. Bc4 Bc5 3. Qh5 g6 4. Qxe5+ Ne7 5. Qxh8+ Ng8
+6. Qxg8+ Bf8 7. Qxf7# 1-0
+
+[Event "Paris"]
+[Site "Paris"]
+[Date "1750.??.??"]
+[EventDate "?"]
+[Round "0.10"]
+[Result "1-0"]
+[White "Kermur Sire De Legal"]
+[Black "Saint Brie"]
+[ECO "C41"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "13"]
+
+1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. Nc3 g6 5. Nxe5 Bxd1 6. Bxf7+
+Ke7 7. Nd5# 1-0
+
+[Event "Open"]
+[Site "Bad Woerishofen GER"]
+[Date "2001.03.22"]
+[EventDate "2001.03.15"]
+[Round "8"]
+[Result "1-0"]
+[White "Oskar Bjarnason"]
+[Black "Volkfried Dittler"]
+[ECO "A00"]
+[WhiteElo "2163"]
+[BlackElo "?"]
+[PlyCount "13"]
+
+1. Nc3 e5 2. Nf3 d6 3. e4 Bg4 4. Bc4 Bh5 5. Nxe5 Bxd1 6. Bxf7+
+Ke7 7. Nd5# 1-0
+
+[Event "North Carolina"]
+[Site "North Carolina"]
+[Date "1975.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Warren"]
+[Black "Bill Wall"]
+[ECO "A02"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "14"]
+
+1. f4 e5 2. fxe5 d6 3. exd6 Bxd6 4. Nf3 h5 5. g3 h4 6. Nxh4
+Rxh4 7. gxh4 Qxh4# 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "1979.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Emil Joseph Diemer"]
+[Black "NN"]
+[ECO "D00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.d4 d5 2.e4 dxe4 3.Nc3 e5 4.Nxe4 exd4 5.Bb5+ c6 6.Bc4 Be6
+7.Qe2 Bxc4 8.Nf6# 1-0
+
+[Event "Strassburg -"]
+[Site "4096"]
+[Date "1880.??.??"]
+[EventDate "1880.??.??"]
+[Round "?"]
+[Result "0-1"]
+[White "Wiede"]
+[Black "Alphonse Goetz"]
+[ECO "C33"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "14"]
+
+1. e4 e5 2. f4 exf4 3. b3 Qh4+ 4. g3 fxg3 5. h3 g2+ 6. Ke2
+Qxe4+ 7. Kf2 gxh1=N# 0-1
+
+[Event "Murnau"]
+[Site "Murnau"]
+[Date "1936.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "H Reinle"]
+[Black "Lange"]
+[ECO "C30"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.e4 e5 2.f4 f5 3.exf5 e4 4.Qh5+ g6 5.fxg6 h6 6.g7 Ke7 7.Qe5+
+Kf7 8.gxh8=N# 1-0
+
+[Event "Rome"]
+[Site "Rome"]
+[Date "1619.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Gioachino Greco"]
+[Black "NN"]
+[ECO "B00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.e4 b6 2.d4 Bb7 3.Bd3 f5 4.exf5 Bxg2 5.Qh5+ g6 6.fxg6 Nf6
+7.gxh7 Nxh5 8.Bg6# 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "1909.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Schulz"]
+[Black "Lehnert"]
+[ECO "C44"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.e4 e5 2.d4 exd4 3.Nf3 Nc6 4.Bc4 Be7 5.c3 dxc3 6.Qd5 d6
+7.Qxf7+ Kd7 8.Be6# 1-0
+
+[Event "Havana sim"]
+[Site "Havana"]
+[Date "1900.03.16"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Harry Nelson Pillsbury"]
+[Black "Fernandez"]
+[ECO "C25"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "17"]
+
+1. e4 e5 2. Nc3 Nc6 3. f4 d6 4. Nf3 a6 5. Bc4 Bg4 6. fxe5 Nxe5
+7. Nxe5 Bxd1 8. Bxf7+ Ke7 9. Nd5# 1-0
+
+[Event "Cologne Germany"]
+[Site "Cologne Germany"]
+[Date "1979.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "D Ham"]
+[Black "A Howard"]
+[ECO "C25"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1. e4 e5 2. f4 exf4 3. Nf3 Nc6 4. Nc3 d6 5. Bc4 Bg4 6. Ne5
+Bxd1 7. Bxf7+ Ke7 8. Nd5# 1-0
+
+[Event "New York"]
+[Site "New York"]
+[Date "1896.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Frank Melville Teed"]
+[Black "Eugene Delmar"]
+[ECO "A80"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.d4 f5 2.Bg5 h6 3.Bf4 g5 4.Bg3 f4 5.e3 h5 6.Bd3 Rh6 7.Qxh5+
+Rxh5 8.Bg6# 1-0
+
+[Event "Haifa"]
+[Site "Haifa"]
+[Date "1968.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Samuel Reshevsky"]
+[Black "Remir B Margolit"]
+[ECO "E42"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "18"]
+
+1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.e3 c5 5.Ne2 d5 6.Bd2 Qa5 7.a3 Nc6
+8.axb4 Nxb4 9.Rxa5 Nd3# 0-1
+
+[Event "corr"]
+[Site "?"]
+[Date "1900.??.??"]
+[EventDate "1900.??.??"]
+[Round "?"]
+[Result "0-1"]
+[White "V M Manko"]
+[Black "Jankowitz"]
+[ECO "C30"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "18"]
+
+1. e4 e5 2. f4 Bc5 3. Ne2 Qf6 4. c3 Nc6 5. g3 Nh6 6. Bg2 Ng4
+7. Rf1 Nxh2 8. fxe5 Qxf1+ 9. Bxf1 Nf3# 0-1
+
+[Event "blindfold simul"]
+[Site "Paris"]
+[Date "1902.06.21"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Harry Nelson Pillsbury"]
+[Black "Magana"]
+[ECO "B00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "19"]
+
+1. e4 f5 2. exf5 Kf7 3. d4 d5 4. Qh5+ g6 5. fxg6+ Kg7 6. Bd3
+Nf6 7. Bh6+ Kg8 8. gxh7+ Nxh7 9. Qg6+ Bg7 10. Qxg7# 1-0
+
+[Event "Eindhoven"]
+[Site "Eindhoven"]
+[Date "1974.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "NN"]
+[Black "Cornelissen"]
+[ECO "C40"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "11"]
+
+1.e4 e5 2.Nf3 f5 3.d4 fxe4 4.Nxe5 d6 5.Qh5+ Ke7 6.Qf7# 1-0
+
+[Event "Iceland"]
+[Site "Iceland"]
+[Date "1947.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Jon Boedvarsson"]
+[Black "Fridrik Olafsson"]
+[ECO "A02"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "10"]
+
+1.f4 e5 2.fxe5 d6 3.exd6 Bxd6 4.Nf3 Nc6 5.h3 Bg3# 0-1
+
+[Event "Helsingfors"]
+[Site "Helsingfors"]
+[Date "1934.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "De Fraenkell"]
+[Black "NN"]
+[ECO "A34"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "9"]
+
+1.c4 c5 2.Nc3 e6 3.Nf3 Ne7 4.Ne4 f5 5.Nd6# 1-0
+
+[Event "Philadelphia"]
+[Site "Philadelphia"]
+[Date "1936.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "F P Arnold"]
+[Black "Milton Loeb Hanauer"]
+[ECO "A51"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "10"]
+
+1.d4 Nf6 2.c4 e5 3.d5 Bc5 4.Bg5 Ne4 5.Bxd8 Bxf2# 0-1
+
+[Event "Siegen"]
+[Site "Siegen"]
+[Date "1941.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Henry Holwell Cole"]
+[Black "Hein"]
+[ECO "A51"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "18"]
+
+1.d4 Nf6 2.c4 e5 3.dxe5 Ne4 4.Nf3 Nc6 5.Nbd2 Nc5 6.g3 h5 7.a3
+Qe7 8.b4 Nxe5 9.bxc5 Nd3# 0-1
+
+[Event "Miscellaneous Game"]
+[Site "?"]
+[Date "1620.??.??"]
+[EventDate "?"]
+[Round "6"]
+[Result "1-0"]
+[White "Gioachino Greco"]
+[Black "NN"]
+[ECO "C53"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "17"]
+
+1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.c3 Nf6 5.Ng5 O-O 6.d3 h6 7.h4
+hxg5 8.hxg5 Nh7 9.Qh5 1-0
+
+[Event "Port Washington"]
+[Site "?"]
+[Date "1969.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Eric Schiller"]
+[Black "Howery Pack"]
+[ECO "C20"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "5"]
+
+1.e4 e5 2.Qh5 Ke7 3.Qxe5# 1-0
+
+[Event "Lisbon,Spanje"]
+[Site "Lisbon,Spanje"]
+[Date "1954.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "A Durao"]
+[Black "S Horta"]
+[ECO "C00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "15"]
+
+1.e4 e6 2.d4 Nf6 3.Bg5 Be7 4.Bd3 O-O 5.Nc3 Nxe4 6.Bxe7 Nxc3
+7.Bxh7+ Kh8 8.Qh5 1-0
+
+[Event "Moskou"]
+[Site "Moskou"]
+[Date "1903.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "B Blumenfeld"]
+[Black "NN"]
+[ECO "C45"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "19"]
+
+1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nge7 5.Nc3 g6 6.Bg5 Bg7
+7.Nd5 Bxd4 8.Qxd4 Nxd4 9.Nf6+ Kf8 10.Bh6# 1-0
+
+[Event "simul"]
+[Site "Washington, DC"]
+[Date "1909.01.06"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Jose Raul Capablanca"]
+[Black "Edward Bradford Adams"]
+[ECO "C46"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "17"]
+
+1.e4 e5 2.Nf3 Nc6 3.Nc3 Bc5 4.Nxe5 Nxe5 5.d4 Bxd4 6.Qxd4 Qf6
+7.Nb5 Kd8 8.Qc5 Nc6 9.Qf8# 1-0
+
+[Event "Paris"]
+[Site "Paris"]
+[Date "1924.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Amedee Gibaud"]
+[Black "Frederic Lazard"]
+[ECO "A45"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "8"]
+
+1.d4 Nf6 2.Nd2 e5 3.dxe5 Ng4 4.h3 Ne3 0-1
+

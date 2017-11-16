@@ -63,9 +63,9 @@ const Nav = (props) => (
       .title {
         margin: 0;
         width: 100%;
-        padding-top: 20px;
-        line-height: 1.15;
-        font-size: 48px;
+        padding-top: 10px;
+        line-height: 1.05;
+        font-size: 36px;
       }
       .title, .description {
         text-align: center;
