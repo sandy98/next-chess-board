@@ -26,7 +26,7 @@ const Poem = (props) => (
 export default class PoemPage extends Component {
   static async getInitialProps () {
     try {  
-      const file = await fetch('https://chessboard.now.sh/static/borges.txt')
+      const file = await fetch('https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/borges.txt')
       const text =  await file.text()
       const lines = text.split(/\n/)
       return {lines}
