@@ -111,13 +111,13 @@ export default class BoardPage2 extends Component {
         
         .card {
 		background-color: #eeeeee;
-                width: 528px;
-                min-width: 528px; 
-                border: none;
-                border-bottom: none; 
+                width: 360px;
+                min-width: 360px; 
+                border: none; 
                 padding: 5px; 
-                border-radius: 8px;
-                margin-left: 10px;      
+                border-radius: 10px;
+                margin-left: 10px; 
+                padding-left: 10px;     
         }
         
       `}</style>
@@ -140,10 +140,10 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.3</h6>                               
+            <h6 className="title">React Chess Board v0.2.5</h6>                               
             <div className="row">
-                <div className="card">
-                  <ChessBoard id={v4()} size={528} moveValidator={true} ref="board1"/>
+                <div>
+                  <ChessBoard id={v4()} size={360} moveValidator={true} ref="board1"/>
                 </div>
                 <div className="card">
                   <div className="row">
@@ -181,6 +181,8 @@ export default class BoardPage2 extends Component {
                     </p>
                   </div>
                   <hr/>
+              </div>
+              <div className="card">
                   <div className="row">
                    <textarea 
                      ref="copypaste"
@@ -270,7 +272,8 @@ export default class BoardPage2 extends Component {
                   <hr/>
                   <div className="row">
                     <label htmlFor="gamePick" style={{color: '#1676a2'}}>Pick a game</label>
-                    <select id="gamePick" style={{height: '2em', minHeight: '2em'}} onChange={(ev) => {
+                    <select id="gamePick" style={{width: "80%", maxWidth: "80%", height: '2em', minHeight: '2em'}} 
+                            onChange={(ev) => {
                             if (ev.target.value < 0) return false
                             let result = this.refs.board1.loadPgn(this.props.pgngames[ev.target.value])
                             if (!result) {
@@ -293,13 +296,11 @@ export default class BoardPage2 extends Component {
                       }
                     </select>
                   </div>
-              </div>
-              <div className="card">
+                <hr/>
                 <div className="row">
-                  <h2>Analysis</h2>
+                  <h3>Analysis</h3>
                 </div>
               </div>
-
             </div>
           </div>
       </Nav>

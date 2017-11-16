@@ -23,7 +23,7 @@ export default class About extends Component {
                 <ChessBoard size={160} flipped={true} selectedSqBg="yellow" moveValidator={true} />
         </div>
         <div className="hero">
-          <h3 className="title">React Chess Board v0.2.4</h3>
+          <h3 className="title">React Chess Board v0.2.5</h3>
           <p className="description">
             What are you waiting? Go to <Link href="/"><a>Board Page</a></Link>
           </p>
