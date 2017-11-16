@@ -16,10 +16,10 @@ export default class BoardPage2 extends Component {
 
   static async getInitialProps() {
     try {
-      const pgnfile = await fetch('https://chessboard.now.sh/static/pgn/quickmates.pgn')
+      const pgnfile = await fetch('https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/pgn/quickmates.pgn')
       const pgntext = await pgnfile.text()
       const pgngames = pgntext.split(/[\n\r]{2}(?=\[)/)
-      const jsonfile = await fetch('https://chessboard.now.sh/static/json/quickmates.json')
+      const jsonfile = await fetch('https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/json/quickmates.json')
       const jsongames = await jsonfile.json()
       console.log(`Json games: ${jsongames.length}   -   Pgn games: ${pgngames.length}`)    
       return {pgngames, jsongames}
@@ -145,7 +145,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.6</h6>                               
+            <h6 className="title">React Chess Board v0.2.7</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard id={v4()} size={360} moveValidator={true} ref="board1"/>
