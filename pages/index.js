@@ -10,7 +10,7 @@ import Snackbar from 'material-ui/Snackbar'
 export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
-    this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0}
+    this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0, sfmsgs: [], sfRunning: false, sfDepth: 10}
     //this.state.flipped = false
   }
 
@@ -30,16 +30,33 @@ export default class BoardPage2 extends Component {
   }
   
   onUciMsg = (ev) => {
-    console.log(`Msg from Stockfish: ${ev.data}`)
+    //console.log(`Msg from Stockfish: ${ev.data}`)
+    this.setState({sfmsgs: [ev.data, ...this.state.sfmsgs]})
+    if (ev.data.match(/uciok/g)) {
+      this.setState({isNotify: true, notifyLen: 2000, notifyMsg: "Engine initialized OK."})
+      console.log("Engine initialized OK")
+    }
+    let m = ev.data.match(/bestmove\s+([a-h][1-8][a-h][1-8][nbrq]?)\s+bestmoveSan\s+([a-h1-8NBRQK+x#]+)\s+/)
+    if (m) {
+      console.log(`Stockfish suggests ${m[1]} (${m[2]})`)
+      this.setState({isNotify: true, notifyMsg: `Engine suggests best move is: ${m[2]}`, notifyLen: 5000, engineSuggestion: m[2]})
+    }
+  }
+
+  processChange = (pos) => {
+    //console.log(`Received CHANGE to pos ${pos}`)
+    this.refs.board1.doScroll()
+    this.setState({engineSuggestion: ''})
+    if (!this.state.sfRunning) return
+    this.stockfish.postMessage('stop')
+    this.stockfish.postMessage('ucinewgame')
+    let fen = this.refs.board1.state.positions[pos]
+    this.stockfish.postMessage(`position fen ${fen}`)
+    this.stockfish.postMessage(`go depth ${this.state.sfDepth}`)
   }
 
   componentDidMount() {
-    this.stockfish = new Worker('/static/js/stockfish.js')
-    this.stockfish.onmessage = this.onUciMsg
-    this.stockfish.postMessage('uci')
-    this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, (pos) => {
-      //console.log(`Received CHANGE to pos ${pos}`)
-      this.refs.board1.doScroll()})
+    this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, this.processChange)
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
     this.unsCheck = this.refs.board1.on(
       ChessBoard.Events.CHECK, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
@@ -56,6 +73,10 @@ export default class BoardPage2 extends Component {
     this.refs.board1.setSize(parseInt(screen.availWidth / 3.4))
     //Warning! Delete next line in production!
     window.page1 = this
+
+    this.stockfish = new Worker('/static/js/stockfish.js')
+    this.stockfish.onmessage = this.onUciMsg
+    this.stockfish.postMessage('uci')
   }
 
    componentWillUnmount() {
@@ -153,7 +174,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.7</h6>                               
+            <h6 className="title">React Chess Board v0.2.9</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -206,8 +227,6 @@ export default class BoardPage2 extends Component {
                     </p>
                   </div>
                   <hr/>
-              </div>
-              <div className="card">
                   <div className="row">
                    <textarea 
                      ref="copypaste"
@@ -295,6 +314,8 @@ export default class BoardPage2 extends Component {
                     </button>
                   </div>
                   <hr/>
+              </div>
+              <div className="card">
                   <div className="row">
                     <label htmlFor="gamePick" style={{color: '#1676a2'}}>Pick a game</label>
                     <select id="gamePick" style={{width: "80%", maxWidth: "80%", height: '2em', minHeight: '2em'}} 
@@ -322,8 +343,83 @@ export default class BoardPage2 extends Component {
                     </select>
                   </div>
                 <hr/>
-                <div className="row">
+                <div style={{textAlign: 'center'}}>
                   <h3>Analysis</h3>
+                  <div ref="sfmsgs" 
+                    className="row"
+                    style={{
+                      border: 'solid 1px',
+                      width: '90%',
+                      minWidth: '90%',
+                      maxWidth: '90%',
+                      height: '15em',
+                      minHeight: '15em',
+                      maxHeight: '15em',
+                      overflowY: 'auto',
+                      overflowX: 'truncate',
+                      padding: '5px',
+                      paddingLeft: '0.75em',
+                      backgroundColor: 'white',
+                      fontSize: '12pt',
+                      fontFamily: 'Monospace'
+                    }}
+                  >
+                    {
+                      this.state.sfmsgs.map(
+                        (msg, i) => 
+                          <p key={i}>{msg}</p>
+                      )
+                    }
+                  </div>
+                  <div className="">
+                    <label htmlFor="inputDepth" style={{color: '#1676a2', fontSize: '14pt', marginRight: '1em'}}>Depth</label>
+                    <input type="number" defaultValue={this.state.sfDepth} id="inputDepth" style={{textAlign: 'right', 
+                                                                                                   fontSize: '14pt', 
+                                                                                                   height: '2em', 
+                                                                                                   width: '3em'}}
+                           onChange={(ev) => this.setState({sfDepth: parseInt(ev.target.value)})} /> 
+                  </div>
+                  <div className="row">
+                      <button 
+                        className="btn" 
+                        onClick={() => {
+                                         let newRunning = !this.state.sfRunning
+                                         this.setState({sfRunning: newRunning})
+                                         if (newRunning) {
+                                           setTimeout(() => this.processChange(this.refs.board1.state.currentPosition), 0)
+                                         }
+                                         else { 
+                                           this.stockfish.postMessage('stop')
+                                           this.setState({engineSuggestion: ''})
+                                         }
+                                       }}
+                        style={{ backgroundColor: this.state.sfRunning ? 'red' : 'auto'}}
+                      >
+                        {this.state.sfRunning ? 'Stop Engine' : 'Start Engine'}
+                      </button>
+                  </div>
+                  <hr/>
+                  <div className="">
+                    <label style={{color: '#1676a2', fontSize: '14pt', marginRight: '1em'}}>Engine Suggestion</label>
+                    <div style={{textAlign: 'center',
+                                 marginTop: '1em',  
+                                 fontSize: '14pt', 
+                                 height: '2em',
+                                 minHeight: '2em',
+                                 maxHeight: '2em', 
+                                 width: '4em',
+                                 minWidth: '4em',
+                                 maxWidth: '4em',
+                                 fontWeight: 'bold',
+                                 color: '#090',
+                                 border: 'solid 1px',
+                                 display: 'inline-block',
+                                 paddingTop: '10px',
+                                 backgroundColor: 'white'}}
+                    > 
+                      {this.state.engineSuggestion}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

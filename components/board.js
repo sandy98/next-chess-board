@@ -194,6 +194,8 @@ const letter2img = {p: 'p.png', P: 'pw.png',
 
 export default class ChessBoard extends Component {
     
+    static version = '0.2.9'
+
     static Events = {
       CHECK_MATE: "CHECK_MATE",
       CHECK: "CHECK",
@@ -313,6 +315,7 @@ export default class ChessBoard extends Component {
       } 
       this.setState({positions: [defaultFen],
                      currentPosition: 0, movements: []})
+      this.emit(ChessBoard.Events.CHANGE, 0)
       return true
     }
 
