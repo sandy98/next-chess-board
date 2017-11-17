@@ -12,6 +12,7 @@
 /.next
 
 # misc
+/.c9
 /.vscode
 .DS_Store
 .env
