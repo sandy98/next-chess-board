@@ -7,9 +7,19 @@ import ChessBoard from '../components/board'
 export default () => {
   let board2
   let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
+  let sqBgs = ChessBoard.getAvailSqColors()
+
   return (
   <div>
     <style jsx>{`
+      .miniSquare {
+        width: 20px;
+        min-width: 20px;
+        height: 20px;
+        min-height: 20px;
+        border: solid 1px;
+      }
+
       .navButton {
         border-radius: 5px;
         padding: 0.5em;
@@ -52,7 +62,7 @@ export default () => {
 
     `}</style>
     
-    <Head title="Test Chess Board - Free Movements" />
+    <Head title="Fancy Chess Board - Free Movements" />
     <Nav>
         <div className="hero" style={{backgroundImage: `url(/static/img/sol-dragon.jpeg)`,
                                       backgroundPosition: '32%', 
@@ -64,7 +74,14 @@ export default () => {
                                       borderRadius: '15px'
                                       }}>
             <div className="row">
-                <ChessBoard id={v4()} size={480} ref={(b2) => board2 = b2}/>
+                <ChessBoard 
+                  id={v4()} 
+                  size={480} 
+                  chessSet="modern"
+                  lightSqsBg="#FFF2D7"
+                  darkSqsBg="#B2535B" 
+                  ref={(b2) => board2 = b2}
+                />
             </div>
             <div className="row" style={{backgroundColor: '#dfdfdf', 
                                          padding: '10px', 
@@ -87,16 +104,26 @@ export default () => {
                                          marginTop: 0}}>
                 <span>
                     <label style={{color: '#1676a2'}} htmlFor="scs">Select chess set:&nbsp;</label>
-                    <select id="scs" onChange={ev => board2.useSet(ev.target.value)}>
+                    <select defaultValue="modern" id="scs" onChange={ev => board2.useSet(ev.target.value)}>
                       <option value="default">Default</option>
-                      {sets.map((set, i) => <option key={i} value={set.toLowerCase()}>{set}</option>)}
+                      {sets.map((set, i) => <option 
+                                              key={i} 
+                                              value={set.toLowerCase()} 
+                                             >
+                                               {set}
+                                             </option>)}
                     </select>
                 </span>
                 <span>
                     <label style={{color: '#1676a2'}} htmlFor="sqc">Select board colors:&nbsp;</label>
-                    <select id="sqc" onChange={ev => board2.useSquares(ev.target.value)}>
-                      <option value={0}>Light blue</option>
-                      <option value={1}>Brown</option>
+                    <select id="sqc" defaultValue={3} onChange={ev => board2.useSquares(ev.target.value)}>
+                      {
+                        [0, 1, 2, 3].map((i) =>
+                          <option key={i} value={i}>
+                            {sqBgs.labels[i]}
+                          </option> 
+                        )
+                      }
                     </select>
                 </span>
             </div>

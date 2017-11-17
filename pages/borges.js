@@ -12,11 +12,12 @@ const Poem = (props) => (
       //color: '#8eaddd',
       backgroundColor: '#ccaa88',
       backgroundImage: 'url(/static/img/monstruos.jpg)',
-      fontFamily: 'Courier'
+      fontFamily: 'Monospace'
 //    fontFamily: 'Lucida Typewriter'
       //color: '#855833'
       }}
-    >
+    >   <h1 style={{fontFamily: 'Gotham', fontWeight: 'bold'}}>El ajedrez</h1>
+        <h3 style={{color: '#bbb', textAlign: 'right', paddingRight: '3em', fontStyle: 'italic'}}>por Jorge Luis Borges</h3>
         {props.lines.map((line, i) => (
             <p key={i}>{line}</p>
           ))}

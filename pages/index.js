@@ -29,11 +29,16 @@ export default class BoardPage2 extends Component {
     }
   }
   
+  onUciMsg = (ev) => {
+    console.log(`Msg from Stockfish: ${ev.data}`)
+  }
+
   componentDidMount() {
-    this.refs.selectBg.value = 1
-    this.refs.board1.useSquares(1)
+    this.stockfish = new Worker('/static/js/stockfish.js')
+    this.stockfish.onmessage = this.onUciMsg
+    this.stockfish.postMessage('uci')
     this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, (pos) => {
-      console.log(`Received CHANGE to pos ${pos}`)
+      //console.log(`Received CHANGE to pos ${pos}`)
       this.refs.board1.doScroll()})
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
     this.unsCheck = this.refs.board1.on(
@@ -55,6 +60,8 @@ export default class BoardPage2 extends Component {
 
    componentWillUnmount() {
     console.log("Will unmount.")
+    this.stockfish.postMessage('quit')
+    setTimeout(() => this.stockfish.terminate(), 0)
     this.unsChange()
     this.unsMove()
     this.unsCheck()
@@ -71,6 +78,7 @@ export default class BoardPage2 extends Component {
    render() {
     let board1
     let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
+    let sqBgs = ChessBoard.getAvailSqColors()
     return (
     <div>
       <style jsx>{`
@@ -145,10 +153,17 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.7</h6>                               
+            <h6 className="title">React Chess Board v0.2.8</h6>                               
             <div className="row">
                 <div>
-                  <ChessBoard id={v4()} size={360} moveValidator={true} ref="board1"/>
+                  <ChessBoard 
+                    id={v4()} 
+                    size={360} 
+                    moveValidator={true} 
+                    ref="board1"
+                    lightSqsBg={sqBgs.light[1]}
+                    darkSqsBg={sqBgs.dark[1]}
+                  />
                 </div>
                 <div className="card">
                   <div className="row">
@@ -179,9 +194,14 @@ export default class BoardPage2 extends Component {
                     </p>
                     <p>
                         <label style={{color: '#1676a2'}} htmlFor="sqc">Select board colors:&nbsp;</label>
-                        <select ref="selectBg" id="sqc" onChange={ev => this.refs.board1.useSquares(ev.target.value)}>
-                          <option value={0}>Light blue</option>
-                          <option value={1}>Brown</option>
+                        <select ref="selectBg" id="sqc" defaultValue={1} onChange={ev => this.refs.board1.useSquares(ev.target.value)}>
+                          {
+                            [0, 1, 2, 3].map((i) =>
+                              <option key={i} value={i}>
+                                {sqBgs.labels[i]}
+                              </option>
+                            )
+                          }
                         </select>
                     </p>
                   </div>

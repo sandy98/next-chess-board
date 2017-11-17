@@ -2,7 +2,6 @@ import {v4} from 'uuid'
 import {Component} from 'react'
 import Chess from 'chess.js'
 
-
 /* General functions */
 
 const range = (b = 0, e = b + 8, r = []) => 
@@ -137,8 +136,9 @@ const partPosition = (pos) => partition([...pos]).map(r => r.join('')).join('/')
 const compressPosition = (pos) => partPosition(pos).replace(/0+/g, (m => m.length.toString()))
 const expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => range(0, parseInt(d)).map(i => '0').join(''))
 
-const lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf']
-const darkSqBgs = ['#6495ed', '#b58863', '#56b6e2']
+const sqBgLabels = ['Blue', 'Brown', 'Acqua', 'Maroon']
+const lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf', '#FFF2D7']
+const darkSqBgs = ['#6495ed', '#b58863', '#56b6e2', "#B2535B"]
 const selectedSqBg = '#bfd'
 
 const emptyPosition = range(0, 64).map(i =>'0').join('')
@@ -371,6 +371,8 @@ export default class ChessBoard extends Component {
       let csan = san.replace(/[NBRQK]/, (f) => this.game.turn() == 'w' ? f.toLowerCase() : f)
       return csan.replace(/[NBRQKnbrqk]/, (l) => ChessBoard.Figurines[l].html)
     }
+
+    static getAvailSqColors = () => {return {light: lightSqBgs, dark: darkSqBgs, labels: sqBgLabels}}
 
     isFlipped = () => this.state.flipped
 
