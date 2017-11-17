@@ -39,7 +39,7 @@ If everything works ok, now you are able to use it.
 
 The main component lives in `components/board.js`
 
-You can take this file and put it wherever you see fit in your proyect, then, for instance in your `index.js`:
+You can take this file and put it wherever you see fit in your react.js project, then, for instance in your `index.js`:
 
 ```js  
     import ChessBoard from 'whereyouputit/board'

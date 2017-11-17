@@ -153,7 +153,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.8</h6>                               
+            <h6 className="title">React Chess Board v0.2.7</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
