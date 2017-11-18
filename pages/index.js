@@ -10,7 +10,7 @@ import Snackbar from 'material-ui/Snackbar'
 export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
-    this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0, sfmsgs: [], sfRunning: false, sfDepth: 10}
+    this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0, sfmsgs: [], sfRunning: false, sfDepth: 15}
     //this.state.flipped = false
   }
 
@@ -31,22 +31,31 @@ export default class BoardPage2 extends Component {
   
   onUciMsg = (ev) => {
     //console.log(`Msg from Stockfish: ${ev.data}`)
-    this.setState({sfmsgs: [ev.data, ...this.state.sfmsgs]})
+    this.setState({sfmsgs: [...this.state.sfmsgs, ev.data]})
+    this.refs.sfmsgs.scrollTop = this.refs.sfmsgs.scrollHeight
     if (ev.data.match(/uciok/g)) {
-      this.setState({isNotify: true, notifyLen: 2000, notifyMsg: "Engine initialized OK."})
+      setTimeout(() => this.setState({isNotify: true, notifyLen: 2000, notifyMsg: "Engine initialized OK."}), 0)
       console.log("Engine initialized OK")
     }
-    let m = ev.data.match(/bestmove\s+([a-h][1-8][a-h][1-8][nbrq]?)\s+bestmoveSan\s+([a-h1-8NBRQK+x#]+)\s+/)
+    let m = ev.data.match(/bestmove\s+([a-h][1-8][a-h][1-8][nbrq]?)\s+bestmoveSan\s+([a-h1-8NBRQK+x#=O0-]+)\s+/)
     if (m) {
       console.log(`Stockfish suggests ${m[1]} (${m[2]})`)
-      this.setState({isNotify: true, notifyMsg: `Engine suggests best move is: ${m[2]}`, notifyLen: 5000, engineSuggestion: m[2]})
+      let m2 = ev.data.match(/score\s+cp\s+(\-?\d+)\b/)
+      let m3 = ev.data.match(/score\s+mate\s+(\-?\d+)\b/)
+      let engineScore = m2 ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '---' 
+      setTimeout(() => 
+                   this.setState({isNotify: true, 
+                                  notifyMsg: `Engine suggests best move is: ${m[2]}`, 
+                                  notifyLen: 5000, 
+                                  engineSuggestion: m[2], 
+                                  engineScore: engineScore}), 0)
     }
   }
 
   processChange = (pos) => {
     //console.log(`Received CHANGE to pos ${pos}`)
     this.refs.board1.doScroll()
-    this.setState({engineSuggestion: ''})
+    this.setState({engineSuggestion: '', engineScore: null})
     if (!this.state.sfRunning) return
     this.stockfish.postMessage('stop')
     this.stockfish.postMessage('ucinewgame')
@@ -56,6 +65,7 @@ export default class BoardPage2 extends Component {
   }
 
   componentDidMount() {
+    this.unsFlip = this.refs.board1.on(ChessBoard.Events.FLIP, (flipped) => this.setState({flipped: flipped}))
     this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, this.processChange)
     this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
     this.unsCheck = this.refs.board1.on(
@@ -80,9 +90,10 @@ export default class BoardPage2 extends Component {
   }
 
    componentWillUnmount() {
-    console.log("Will unmount.")
+    // console.log("Will unmount.")
     this.stockfish.postMessage('quit')
     setTimeout(() => this.stockfish.terminate(), 0)
+    this.unsFlip()
     this.unsChange()
     this.unsMove()
     this.unsCheck()
@@ -103,6 +114,33 @@ export default class BoardPage2 extends Component {
     return (
     <div>
       <style jsx>{`
+        .gridContainer {
+          display: grid;
+          margin-top:1em;
+          margin-left: 5%;
+          grid-row-gap: 3px;
+          grid-column-gap: 3px;
+          width: 80%;
+        }
+
+        .engineInfo {
+          text-align: center;
+          margin-top: 1em;  
+          font-size: 14pt; 
+          height: 2em;
+          min-height: 2em;
+          max-height: 2em; 
+          width: 4em;
+          min-width: 4em;
+          max-width: 7em;
+          font-weight: bold;
+          color: #090;
+          border: solid 1px black;
+          display: inline-block;
+          padding-top: 10px;
+          background-color: white;
+        }
+
         .navButton {
           border-radius: 5px;
           padding: 0.5em;
@@ -174,7 +212,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.2.9</h6>                               
+            <h6 className="title">React Chess Board v0.3.0</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -200,17 +238,17 @@ export default class BoardPage2 extends Component {
                     <button className="btn" disabled={false} onClick={() => this.refs.board1.takeback()} title="Undo last move">Undo</button>
                   </div>
                   <div className="row">
-                    <button className="btn wide" onClick={() => {this.refs.board1.flip(); this.setState({flipped: !this.state.flipped})}} title="Flip/Unflip the board">
+                    <button className="btn wide" onClick={() => this.refs.board1.flip()} title="Flip/Unflip the board">
                     {(this && this.state) ? (this.state.flipped ? "UnFlip" : "Flip") : "Flip"}
                     </button>
                   </div>
                   <hr/>
                   <div className="row">
                     <p>
-                        <label style={{color: '#1676a2'}} htmlFor="scs">Select chess set:&nbsp;</label>
-                        <select id="scs" onChange={ev => this.refs.board1.useSet(ev.target.value)}>
+                        <label style={{color: '#1676a2'}} htmlFor="sqs">Select figures set:&nbsp;</label>
+                        <select defaultValue="default" id="scs" onChange={ev => this.refs.board1.useSet(ev.target.value)}>
                           <option value="default">Default</option>
-                          {sets.map((set, i) => <option key={i} value={set.toLowerCase()}>{set}</option>)}
+                          {sets.map((set, i) => <option key={i} value={set.toLowerCase()}>{set} </option>)}
                         </select>
                     </p>
                     <p>
@@ -346,28 +384,30 @@ export default class BoardPage2 extends Component {
                 <div style={{textAlign: 'center'}}>
                   <h3>Analysis</h3>
                   <div ref="sfmsgs" 
-                    className="row"
+                    className=""
                     style={{
                       border: 'solid 1px',
                       width: '90%',
                       minWidth: '90%',
                       maxWidth: '90%',
-                      height: '15em',
-                      minHeight: '15em',
-                      maxHeight: '15em',
-                      overflowY: 'auto',
-                      overflowX: 'truncate',
+                      height: '10em',
+                      minHeight: '10em',
+                      maxHeight: '10em',
+                      overflowY: 'scroll',
+                      overflowX: 'hidden',
                       padding: '5px',
-                      paddingLeft: '0.75em',
+                      paddingLeft: '0,5em',
                       backgroundColor: 'white',
                       fontSize: '12pt',
-                      fontFamily: 'Monospace'
+                      fontFamily: 'Monospace',
+                      textAlign: 'left',
+                      cursor: 'default'
                     }}
                   >
                     {
                       this.state.sfmsgs.map(
                         (msg, i) => 
-                          <p key={i}>{msg}</p>
+                          <p key={i} title={msg}>{msg}</p>
                       )
                     }
                   </div>
@@ -390,7 +430,7 @@ export default class BoardPage2 extends Component {
                                          }
                                          else { 
                                            this.stockfish.postMessage('stop')
-                                           this.setState({engineSuggestion: ''})
+                                           this.setState({engineSuggestion: '', engineScore: null})
                                          }
                                        }}
                         style={{ backgroundColor: this.state.sfRunning ? 'red' : 'auto'}}
@@ -399,26 +439,37 @@ export default class BoardPage2 extends Component {
                       </button>
                   </div>
                   <hr/>
-                  <div className="">
-                    <label style={{color: '#1676a2', fontSize: '14pt', marginRight: '1em'}}>Engine Suggestion</label>
-                    <div style={{textAlign: 'center',
-                                 marginTop: '1em',  
-                                 fontSize: '14pt', 
-                                 height: '2em',
-                                 minHeight: '2em',
-                                 maxHeight: '2em', 
-                                 width: '4em',
-                                 minWidth: '4em',
-                                 maxWidth: '4em',
-                                 fontWeight: 'bold',
-                                 color: '#090',
-                                 border: 'solid 1px',
-                                 display: 'inline-block',
-                                 paddingTop: '10px',
-                                 backgroundColor: 'white'}}
-                    > 
-                      {this.state.engineSuggestion}
+                  <div className="gridContainer">
+                    <div className="">
+                      <label style={{textAlign: 'left', 
+                                    color: '#1676a2', 
+                                    fontSize: '14pt', 
+                                    marginRight: '1em',
+                                    gridRow: '2',
+                                    gridColumn: '1 / 4'}}
+                      >
+                        Engine Suggestion
+                      </label>
+                      <div className="engineInfo" style={{gridRow: '1 / 3', gridColumn: '5'}}> 
+                        {this.state.engineSuggestion}
+                      </div>
                     </div>
+                    <div className="">
+                      <label style={{textAlign: 'left', 
+                                    color: '#1676a2', 
+                                    fontSize: '14pt', 
+                                    marginRight: '1em',
+                                    gridRow: '6',
+                                    gridColumn: '1 / 4'}}
+                      >
+                        Engine Score
+                      </label>
+                      <div className="engineInfo" style={{gridRow: '5 / 7', gridColumn: '5'}}> 
+                        {this.state.engineScore ? 
+                          this.state.engineScore.toFixed ? 
+                            this.state.engineScore.toFixed(2) : this.state.engineScore : ''}
+                      </div>
+                  </div>
                   </div>
                 </div>
               </div>

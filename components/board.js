@@ -204,7 +204,8 @@ export default class ChessBoard extends Component {
       INSUFFICIENT_MATERIAL: "INSUFFICIENT_MATERIAL",
       MOVE: "MOVE",
       ERROR: "ERROR",
-      CHANGE: "CHANGE"
+      CHANGE: "CHANGE",
+      FLIP: "FLIP"
     }
     
     static Messages = {
@@ -424,7 +425,9 @@ export default class ChessBoard extends Component {
     }
 
     flip = () => {
-      this.setState({flipped: !this.state.flipped})
+      let newFlipped = !this.state.flipped
+      this.setState({flipped: newFlipped})
+      this.emit(ChessBoard.Events.FLIP, newFlipped)
     } 
 
     setHeader = (k, v) => {
@@ -492,14 +495,27 @@ export default class ChessBoard extends Component {
         this.setState({isCrowning: true})
     }
 
-    move = (sqFrom, sqTo, figure, crowning) => {
-      if (this.state.currentPosition !== this.state.positions.length - 1) {return}
-      if (this.whoMovesCurrent() !== figureColor(figure)) {return}
+    //move = (sqFrom, sqTo, figure, crowning) => {
+    move = (...args) => {
+      if (this.state.currentPosition !== this.state.positions.length - 1)  {
+        return this.emit(ChessBoard.Events.ERROR, `attempt to move from a previous position`)
+      }
+      let argsLen = args.length
+      if (argsLen === 0 || argsLen === 2) {
+        return this.emit(ChessBoard.Events.ERROR, `move called with wrong number of arguments: ${argsLen}`)
+      }
+      let [sqFrom, sqTo, figure, crowning ] = args
+      if (argsLen > 1 && this.whoMovesCurrent() !== figureColor(figure))   {
+        return this.emit(ChessBoard.Events.ERROR, `attempt to move with the wrong turn`)
+      }
       if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
           this.getCrowning(sqFrom, sqTo, figure)
           return
       }
-      if (!this.props.moveValidator) {
+      if (argsLen === 1 && !this.props.moveValidator) {
+        return this.emit(ChessBoard.Events.ERROR, "can't process san move without a move validator")
+      }
+      if (!this.props.moveValidator && argsLen > 1) {
           let oldFigure
           if (crowning) {[oldFigure, figure] = [figure, crowning]}
           else {oldFigure = figure} 
@@ -558,11 +574,19 @@ export default class ChessBoard extends Component {
       this.emit(ChessBoard.Events.CHANGE, newCurrPos) 
       this.emit(ChessBoard.Events.MOVE, this.state.movements[this.state.movements.length -1])} 
       else {
-        let params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
-        params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
-        //console.log(`Game move params: from: ${params.from}, to: ${params['to']}, promotion: ${params.promotion}`)
+        let params
+        if (argsLen === 1) {
+          params = args[0]
+        }
+        else {
+          params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
+          params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
+        }
         let move = this.game.move(params)
-        if (move) {
+        if (!move) {
+          return this.emit(ChessBoard.Events.ERROR, 'wrong san')
+        }
+        else {
           let newCurrentPos = this.game.fens().length -1
           let sans = this.game.history()
           let san = sans[sans.length - 1]
@@ -570,8 +594,6 @@ export default class ChessBoard extends Component {
           let dots = this.game.turn() === 'b' ? '.' : '. ...'
 
           this.setState({currentPosition: newCurrentPos, 
-//                         positions: [...this.state.positions, this.game.fen()],
-//                         movements: [...this.state.movements, san]})
                          positions: this.game.fens(),
                          movements: this.game.history()})
 
@@ -579,7 +601,6 @@ export default class ChessBoard extends Component {
           this.emit(ChessBoard.Events.MOVE, san) 
 
           if (this.game.in_check() && !this.game.in_checkmate()) {
-              //console.log("Emitting CHECK")
               this.emit(ChessBoard.Events.CHECK, `${moveNumber}${dots} ${san}`)              
           }
 

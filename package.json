@@ -1,5 +1,5 @@
 {
-  "version": "0.2.9",
+  "version": "0.3.0",
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
   "main": "lib/board.js",
@@ -22,9 +22,9 @@
     "chess.js": "https://github.com/sandy98/chess.js",
     "isomorphic-fetch": "^2.2.1",
     "material-ui": "next",
-    "next": "^4.1.4",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
     "react-markdown": "^2.5.0",
     "stockfish": "^8.0.0"
   }
