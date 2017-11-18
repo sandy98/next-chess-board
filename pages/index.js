@@ -11,6 +11,8 @@ export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
     this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0, sfmsgs: [], sfRunning: false, sfDepth: 15}
+    this.clickSnd = new Audio('/static/sounds/click.wav')
+    this.clickSnd.volume = 0.3
     //this.state.flipped = false
   }
 
@@ -40,6 +42,7 @@ export default class BoardPage2 extends Component {
     let m = ev.data.match(/bestmove\s+([a-h][1-8][a-h][1-8][nbrq]?)\s+bestmoveSan\s+([a-h1-8NBRQK+x#=O0-]+)\s+/)
     if (m) {
       console.log(`Stockfish suggests ${m[1]} (${m[2]})`)
+      this.setState({isPondering: false})
       let m2 = ev.data.match(/score\s+cp\s+(\-?\d+)\b/)
       let m3 = ev.data.match(/score\s+mate\s+(\-?\d+)\b/)
       let engineScore = m2 ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '---' 
@@ -62,16 +65,25 @@ export default class BoardPage2 extends Component {
     let fen = this.refs.board1.state.positions[pos]
     this.stockfish.postMessage(`position fen ${fen}`)
     this.stockfish.postMessage(`go depth ${this.state.sfDepth}`)
+    this.setState({isPondering: true})
   }
 
   componentDidMount() {
+    this.clickSnd = new Audio('/static/sounds/click.wav')
+    this.clickSnd.volume = 0.3
     this.unsFlip = this.refs.board1.on(ChessBoard.Events.FLIP, (flipped) => this.setState({flipped: flipped}))
     this.unsChange = this.refs.board1.on(ChessBoard.Events.CHANGE, this.processChange)
-    this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`))
+    this.unsMove = this.refs.board1.on(ChessBoard.Events.MOVE, (move) => {
+      //console.log(`MOVIDA RECIBIDA: ${move}\n\n\n`)
+      if (this && this.clickSnd) this.clickSnd.play()
+    })
     this.unsCheck = this.refs.board1.on(
       ChessBoard.Events.CHECK, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 5000})) 
     this.unsCheckMate = this.refs.board1.on(
-      ChessBoard.Events.CHECK_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
+      ChessBoard.Events.CHECK_MATE, (data) => {
+        this.stockfish.postMessage('stop')
+        this.setState({isPondering: false, isNotifY: true, notifyMsg: data, notifyLen: 60000})
+      }) 
     this.unsStaleMate = this.refs.board1.on(
       ChessBoard.Events.STALE_MATE, (data) => this.setState({isNotifY: true, notifyMsg: data, notifyLen: 60000})) 
     this.unsInsufficient = this.refs.board1.on(
@@ -212,7 +224,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.3.0</h6>                               
+            <h6 className="title">React Chess Board v0.3.1</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -450,7 +462,10 @@ export default class BoardPage2 extends Component {
                       >
                         Engine Suggestion
                       </label>
-                      <div className="engineInfo" style={{gridRow: '1 / 3', gridColumn: '5'}}> 
+                      <div className="engineInfo" style={{gridRow: '1 / 3', 
+                                                          gridColumn: '5',
+                                                          backgroundImage: this.state.isPondering ? 'url(/static/img/spinner.gif)' : 'none',
+                                                          backgroundRepeat: 'no-repeat', backgroundPosition: 'center'}}> 
                         {this.state.engineSuggestion}
                       </div>
                     </div>
@@ -464,7 +479,10 @@ export default class BoardPage2 extends Component {
                       >
                         Engine Score
                       </label>
-                      <div className="engineInfo" style={{gridRow: '5 / 7', gridColumn: '5'}}> 
+                      <div className="engineInfo" style={{gridRow: '5 / 7', 
+                                                          gridColumn: '5',
+                                                          backgroundImage: this.state.isPondering ? 'url(/static/img/spinner.gif)' : 'none',
+                                                          backgroundRepeat: 'no-repeat', backgroundPosition: 'center'}}> 
                         {this.state.engineScore ? 
                           this.state.engineScore.toFixed ? 
                             this.state.engineScore.toFixed(2) : this.state.engineScore : ''}
