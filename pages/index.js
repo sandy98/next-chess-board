@@ -7,13 +7,12 @@ import Nav from '../components/nav'
 import ChessBoard from '../components/board'
 import Snackbar from 'material-ui/Snackbar'
 
+const Messages = {}
+
 export default class BoardPage2 extends Component {
   constructor(props) {
     super(props)
     this.state = {isNotifY: false, notifyMsg: '', notifyLen: 0, sfmsgs: [], sfRunning: false, sfDepth: 15}
-    this.clickSnd = new Audio('/static/sounds/click.wav')
-    this.clickSnd.volume = 0.3
-    //this.state.flipped = false
   }
 
   static async getInitialProps() {
@@ -224,7 +223,7 @@ export default class BoardPage2 extends Component {
                                         padding: '1em',
                                         /* borderRadius: '15px', */
                                         }}>
-            <h6 className="title">React Chess Board v0.3.1</h6>                               
+            <h6 className="title">React Chess Board v0.3.2</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
