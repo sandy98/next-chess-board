@@ -1,4 +1,4 @@
-# React Chess Board v0.3.2
+# React Chess Board v0.3.3
 
 Yet another Javascript chessboard.
 

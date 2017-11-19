@@ -2,6 +2,7 @@ import {Component} from 'react'
 import fetch from 'isomorphic-fetch'
 import Head from '../components/head'
 import Nav from '../components/nav'
+import MyFooter from '../components/footer'
 
 const Poem = (props) => (
     <div style={{
@@ -45,6 +46,7 @@ export default class PoemPage extends Component {
         <Nav>
           <Poem lines={this.props.lines} />
         </Nav>
+        <MyFooter/>
       </div>
     )
   }

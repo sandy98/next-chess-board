@@ -2,6 +2,7 @@ import {Component} from 'react'
 import Link from 'next/link'
 import Head from '../components/head'
 import Nav from '../components/nav'
+import MyFooter from '../components/footer'
 import ReactMarkdown from 'react-markdown'
 import 'isomorphic-fetch'
 import ChessBoard from '../components/board'
@@ -16,14 +17,14 @@ export default class About extends Component {
 
   render = () => (
     <div>
-        <Head title="Home" />
+        <Head title="About Next Chess Board" />
         <Nav>
 
         <div className="row">
                 <ChessBoard hideNotation={true} size={160} flipped={true} selectedSqBg="yellow" moveValidator={true} />
         </div>
         <div className="hero">
-          <h3 className="title">React Chess Board v0.3.2</h3>
+          <h3 className="title">React Chess Board v0.3.3</h3>
           <p className="description">
             What are you waiting? Go to <Link href="/"><a>Board Page</a></Link>
           </p>
@@ -42,6 +43,7 @@ export default class About extends Component {
           </div>
         </div>
       </Nav>
+      <MyFooter/>
     </div>
   )
 }

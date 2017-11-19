@@ -2,6 +2,7 @@ import {v4} from 'uuid'
 import Link from 'next/link'
 import Head from '../components/head'
 import Nav from '../components/nav'
+import MyFooter from '../components/footer'
 import ChessBoard from '../components/board'
 
 export default () => {
@@ -129,5 +130,6 @@ export default () => {
             </div>
         </div>
     </Nav>
+    <MyFooter style={{color: 'red'}} />
   </div>
 )}
