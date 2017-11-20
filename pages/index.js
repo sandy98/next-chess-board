@@ -276,7 +276,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.3.3</h6>                               
+            <h6 className="title">React Chess Board v0.3.4</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -426,7 +426,7 @@ export default class BoardPage2 extends Component {
                     </select>
                   </div>
               </div>
-              <div className="card">
+              <div className="card" style={{paddingLeft: '10px'}}>
                   <div className="row">
                     <label htmlFor="gamePick" style={{color: '#1676a2'}}>{Messages.PICK_A_GAME[this.state.lang]}</label>
                     <select id="gamePick" style={{width: "80%", maxWidth: "80%", height: '2em', minHeight: '2em'}} 
