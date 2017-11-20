@@ -276,7 +276,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.3.4</h6>                               
+            <h6 className="title">React Chess Board v0.3.6</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -532,6 +532,12 @@ export default class BoardPage2 extends Component {
                            backgroundRepeat: 'no-repeat', backgroundPosition: 'center', cursor: 'pointer'}}
                            title={this.state.engineSuggestion && this.state.engineSuggestion !== '-' ? 
                              Messages.ENGINE_TITLE[this.state.lang] : ''}
+                           onSelect={
+                             (e) => {
+                               if (e.preventDefault) e.preventDefault()
+                               if (e.cancelBubble) e.cancelBubble()
+                               return false
+                           }}
                            onDoubleClick={(ev) => {
                              if (ev.preventDefault) ev.preventDefault()
                              if (ev.cancelBubble) ev.cancelBubble()
