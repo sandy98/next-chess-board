@@ -1,5 +1,6 @@
 # React Chess Board v0.3.9
--------------------->![Old game](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/mangiaterra-savoretti-1988.png)
+
+![Old game](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/mangiaterra-savoretti-1988.png)
 
 Yet another Javascript chessboard.
 
@@ -33,10 +34,15 @@ You are ready to use ChessBoard component in your react.js project, for instance
 ```
 
 ---
-## Usage
->Fine tuning of the component.
+## API
+#### Static properties and methods
+```Chessboard.chessSets``` Exposes an array of image sets in data format, which is used internally by the board to draw its images. This means that the user of the component doesn't have to care about figure images location, since they are embedded within the component itself. Exposing them publicly through this property allows their usage outside of the chessboard, for example:
+```html
+  <img src={ChessBoard.chessSets.alt1.B} title="White Bishop from alt1 set" />
+```
 
->Yet to be written.
+
+>Work in progress
 
 ---
 
