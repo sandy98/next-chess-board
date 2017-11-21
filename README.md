@@ -1,5 +1,5 @@
 # React Chess Board v0.3.9
-![Old game](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/mangiaterra-savoretti-1988.png)
+-------------------->![Old game](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/mangiaterra-savoretti-1988.png)
 
 Yet another Javascript chessboard.
 
