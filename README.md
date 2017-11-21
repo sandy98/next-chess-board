@@ -8,45 +8,25 @@ Intended to be used as a pluggable component in projects constructed using [Reac
 
 ## Install
 
-Download
+Through npm
 ```sh
-   git clone https://github.com/sandy98/next-chess-board
+   cd your-react-project-folder
+   npm install --save next-chess-board
 ```
-or
+or through yarn
 ```sh
-   git clone github.com/sandy98/next-chess-board.git
-```
-then install dependencies
-```sh
-   cd next-chess-board
-   yarn
-```
-or
-```sh
-   cd next-chess-board
-   npm install
-```
-then test
-```sh
-   yarn dev
-```
-or
-```sh
-   npm run dev
+   cd your-react-project-folder
+   yarn add next-chess-board
 ```
 
-If everything works ok, now you are able to use it.
-
-The main component lives in `components/board.js`
-
-You can take this file and put it wherever you see fit in your react.js project, then, for instance in your `index.js`:
+You are ready to use ChessBoard component in your react.js project, for instance in your `index.js`:
 
 ```js  
-    import ChessBoard from 'whereyouputit/board'
+    import ChessBoard from 'next-chess-board'
     
     export default () => (
       <div>
-        <Chessboard />
+        <Chessboard size={400} moveValidator={true} />
       </div>
     )
 ```
