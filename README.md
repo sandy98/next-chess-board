@@ -64,7 +64,7 @@ static Messages = {
     }
 ```
 
-These are the messages that ChessBoard internally uses to provide feedback to its client page. As it shows, it's an array of objects, each one of them providing a string message in English and Spanish. It's up to the client page to choose the proper one according to its settings. Example of this can be seen in the message handliers implemented in ```index.js``` which provides for the home page at the demo site. It can be found under the ```pages``` directory of the source. It's strongly recommended to have a thorough look at it, as it shows almost all the features depicted here. 
+These are the messages that ChessBoard internally uses to provide feedback to its client page. As it shows, it's an array of objects, each one of them providing a string message in English and Spanish. It's up to the client page to choose the proper one according to its settings. Example of this can be seen in the message handliers implemented in ```index.js``` which provides for the home page at the demo site. It can be found under the ```/pages``` directory of the source. It's strongly recommended to have a thorough look at it, as it shows almost all the features depicted here. 
 
 ---
 ```js
