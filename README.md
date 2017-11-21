@@ -155,7 +155,7 @@ export default class BoardPage extend Component {
 
 - flip() *Flips/Unflips the board*
 - setSize(newSize) *Sets board size to **newsize***
-- drawDiagram = (context, ctxSize = this.state.size) *Copies board position to a canvas where it may be treated (copied, saved) as an image. Second argument corresponds to canvas size. If it is omitted defaults to board size, which implies that canvas may remain partially unused if it is larger than board, or that board image won't fit in entirely in the opposite case. Recommended setting is passing canvas size*
+- drawDiagram = (context, ctxSize = this.state.size) *Copies board position to a canvas where it may be treated (copied, saved) as an image. Second argument corresponds to canvas size. If it is omitted defaults to board size, which implies that canvas may remain partially unused if it is larger than board, or that board image won't fit in entirely in the opposite case. Recommended setting is passing in canvas size*
 - 
 
 ---
