@@ -7,7 +7,7 @@ const steimberg = 155978933
 
 export default class ChessBoard extends Component {
     
-    static version = '0.3.9'
+    static version = '0.4.0'
 
     /* General functions */
 
@@ -69,10 +69,10 @@ export default class ChessBoard extends Component {
     static col = sq => sq % 8
     static difCol = (sq1, sq2) => Math.abs(ChessBoard.col(sq1) - ChessBoard.col(sq2))
     static difRow = (sq1, sq2) => Math.abs(ChessBoard.row(sq1) - ChessBoard.row(sq2))
-    static isSameCol = (sq1, sq2) => difCol(sq1, sq2) === 0
-    static isSameRow = (sq1, sq2) => difRow(sq1, sq2) === 0
-    static isDiagonal = (sq1, sq2) => (sq1 != sq2) && (difRow(sq1, sq2) === difCol(sq1, sq2))
-    static isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
+    static isSameCol = (sq1, sq2) => ChessBoard.difCol(sq1, sq2) === 0
+    static isSameRow = (sq1, sq2) => ChessBoard.difRow(sq1, sq2) === 0
+    static isDiagonal = (sq1, sq2) => (sq1 != sq2) && (ChessBoard.difRow(sq1, sq2) === ChessBoard.difCol(sq1, sq2))
+    static isAntiDiagonal = (sq1, sq2) => ChessBoard.isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
     static isBlackSquare = (sq) => ((ChessBoard.row(sq) % 2 === 0) && (ChessBoard.col(sq) % 2 === 0)) || ((ChessBoard.row(sq) % 2 === 1) && (ChessBoard.col(sq) % 2 === 1))
     static sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + ChessBoard.col(sq))}${ChessBoard.row(sq) + 1}` : '-'
     static san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
@@ -86,10 +86,8 @@ export default class ChessBoard extends Component {
                          q: 'q.png', Q: 'qw.png',
                          k: 'k.png', K: 'kw.png'}
     
-    
     //
-    
-        
+            
 
     static chessSets = {
       alt1: {
@@ -240,6 +238,9 @@ export default class ChessBoard extends Component {
       Q: {codePoint: '0x2655',	html: '&#9813;'},
       K: {codePoint: '0x2654',	html: '&#9812;'}
     }
+
+    static getAvailSqColors = () => {return {light: ChessBoard.lightSqBgs, dark: ChessBoard.darkSqBgs, labels: ChessBoard.sqBgLabels}}
+    
 
     drawDiagram = (context, ctxSize = this.state.size) => {
       let x, y, xx, yy, img
@@ -432,8 +433,6 @@ export default class ChessBoard extends Component {
       return csan.replace(/[NBRQKnbrqk]/, (l) => ChessBoard.Figurines[l].html)
     }
 
-    static getAvailSqColors = () => {return {light: ChessBoard.lightSqBgs, dark: ChessBoard.darkSqBgs, labels: ChessBoard.sqBgLabels}}
-
     isFlipped = () => this.state.flipped
 
     paramFromPosition = (npos, nparam) => this.state.positions[npos].split(/\s+/)[nparam]
@@ -597,7 +596,7 @@ export default class ChessBoard extends Component {
       
       const newCurrPos = this.state.positions.length
 
-      const newComprPos = compressPosition(newPos.join(''))
+      const newComprPos = ChessBoard.compressPosition(newPos.join(''))
 
       const newWhoMoves = this.whoMovesCurrent() === 'w' ? 'b' : 'w'
       
@@ -778,7 +777,7 @@ export default class ChessBoard extends Component {
                     content = ''
                   }
                   else {
-                    //let imgsrc = `/static/img/sets/${this.state.chessSet}/${letter2img[figure]}`
+                    //let imgsrc = `/static/img/sets/${this.state.chessSet}/${ChessBoard.letter2img[figure]}`
                     content = (
                         <img
                           src={ChessBoard.chessSets[this.state.chessSet][figure]}
