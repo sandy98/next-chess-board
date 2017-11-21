@@ -7,7 +7,7 @@ const steimberg = 155978933
 
 export default class ChessBoard extends Component {
     
-    static version = '0.3.8'
+    static version = '0.3.9'
 
     /* General functions */
 
@@ -326,7 +326,7 @@ export default class ChessBoard extends Component {
 
     useSet = (set) => this.setState({chessSet: set})
 
-    useSquares = (n) => this.setState({lightSqsBg: ChessBoard.lightSqBgs[n], darkSqsBg: darkSqBgs[n]})
+    useSquares = (n) => this.setState({lightSqsBg: ChessBoard.lightSqBgs[n], darkSqsBg: ChessBoard.darkSqBgs[n]})
 
 
     goto = (n) => {
