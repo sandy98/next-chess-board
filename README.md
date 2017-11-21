@@ -156,7 +156,10 @@ export default class BoardPage extend Component {
 - flip() *Flips/Unflips the board*
 - setSize(newSize) *Sets board size to **newsize***
 - drawDiagram = (context, ctxSize = this.state.size) *Copies board position to a canvas where it may be treated (copied, saved) as an image. Second argument corresponds to canvas size. If it is omitted defaults to board size, which implies that canvas may remain partially unused if it is larger than board, or that board image won't fit in entirely in the opposite case. Recommended setting is passing in canvas size*
-- 
+- doScroll = () *Auxiliary function to scroll notation panel to the bottom. Imperative (smells)* 
+- useSet = (set) => {} *Defines shape for figures being shown. Available values for **set** are: 'default', 'alt1', 'modern', 'fantasy', 'spatial', 'eyes' and 'veronika'. Feel free to roll your own*
+- useSquares = (n) => {...} *Defines color for light and dark squares on the board. There are currently 4 schemas available (0, 1, 2, 3, 4) a.k.a. ('Blue', 'Brown', 'Acqua', 'Maroon'). Take on account, however, that the function must be invoked with a numerical argument. For instance, ```board.useSquares(1)``` gives you these board colors* ![King Indian](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/king_indian_taimanov.png)
+
 
 ---
 
