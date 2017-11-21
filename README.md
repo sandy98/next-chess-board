@@ -155,10 +155,25 @@ export default class BoardPage extend Component {
 
 - flip() *Flips/Unflips the board*
 - setSize(newSize) *Sets board size to **newsize***
-- drawDiagram = (context, ctxSize = this.state.size) *Copies board position to a canvas where it may be treated (copied, saved) as an image. Second argument corresponds to canvas size. If it is omitted defaults to board size, which implies that canvas may remain partially unused if it is larger than board, or that board image won't fit in entirely in the opposite case. Recommended setting is passing in canvas size*
-- doScroll = () *Auxiliary function to scroll notation panel to the bottom. Imperative (smells)* 
-- useSet = (set) => {} *Defines shape for figures being shown. Available values for **set** are: 'default', 'alt1', 'modern', 'fantasy', 'spatial', 'eyes' and 'veronika'. Feel free to roll your own*
-- useSquares = (n) => {...} *Defines color for light and dark squares on the board. There are currently 4 schemas available (0, 1, 2, 3, 4) a.k.a. ('Blue', 'Brown', 'Acqua', 'Maroon'). Take on account, however, that the function must be invoked with a numerical argument. For instance, ```board.useSquares(1)``` gives you these board colors* ![King Indian](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/king_indian_taimanov.png)
+- drawDiagram(context, ctxSize = this.state.size) *Copies board position to a canvas where it may be treated (copied, saved) as an image. Second argument corresponds to canvas size. If it is omitted defaults to board size, which implies that canvas may remain partially unused if it is larger than board, or that board image won't fit in entirely in the opposite case. Recommended setting is passing in canvas size*
+- doScroll() *Auxiliary function to scroll notation panel to the bottom. Imperative (smells)* 
+- useSet(set) *Defines shape for figures being shown. Available values for **set** are: 'default', 'alt1', 'modern', 'fantasy', 'spatial', 'eyes' and 'veronika'. Feel free to roll your own*
+- useSquares(n) *Defines color for light and dark squares on the board. There are currently 4 schemas available (0, 1, 2, 3, 4) a.k.a. ('Blue', 'Brown', 'Acqua', 'Maroon'). Take on account, however, that the function must be invoked with a numerical argument. For instance, ```board.useSquares(1)``` gives you these board colors* ![King Indian](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/king_indian_taimanov.png)
+- goto(n) *Sets the board position to **n** and consequently redraws it to reflect the new position, where **n** should be a number between 0 and ``` positions.length - 1 ```. But regardless, ChessBoard won't allow going off boundaries.
+- previous()
+- next()
+- last()
+- first() *4 convenience methods to move to previous, next, last and first position respectively. They call ```goto()```  under the hood.*
+- empty() *As the name implies, it just empties the chessboard*
+- reset() *Resets the board, cleaning the positions and movements arrays, and sets it to ```ChessBoard.defaultFen```*
+- loadFen(fen) *Reads a string in [Forsyth Edwards notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) and attemps to make it the current first position*
+- loadPgn(pgn) *Reads a string in [Portable Game Notation](https://en.wikipedia.org/wiki/Portable_Game_Notation) and attempts to load its data and all the moves in the current game. Requires ```moveValidator={true}``` in the properties for this to work*
+- takeback() *Undoes last move. Not to be used in play mode.*
+- move(...args) *the essence of the whole thing, performing moves, where **...args** is an array of arguments with a number that can be: 
+ a. 1 = move in [Standard Algebraic Notation](https://en.wikipedia.org/wiki/Algebraic_notation_%28chess%29). moveValidator must be true for this to work 
+ b. 3 = sqFrom, sqTo, figure. This is the way ChessBoard uses to perform moves in response to user actions
+ c. 4 = sqFrom, sqTo, figure, promotion. Same as previous, with promotion special case. sqFrom and sqTo are numerical, while figure and promotion are string representation of the figure being moved or promoted to respectively*
+-
 
 
 ---
