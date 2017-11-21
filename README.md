@@ -173,8 +173,12 @@ export default class BoardPage extend Component {
  a. 1 = move in [Standard Algebraic Notation](https://en.wikipedia.org/wiki/Algebraic_notation_%28chess%29). moveValidator must be true for this to work 
  b. 3 = sqFrom, sqTo, figure. This is the way ChessBoard uses to perform moves in response to user actions
  c. 4 = sqFrom, sqTo, figure, promotion. Same as previous, with promotion special case. sqFrom and sqTo are numerical, while figure and promotion are string representation of the figure being moved or promoted to respectively*
--
-
+- isFlipped() *Just lets the client know if the board is flipped (just in case the client is not human and/or can't see :-)*
+- setHeader(k, v) *Sets game header **k** to value **v**. For example: `game.setHeader('Place', 'Rosario')`*
+- setDate(date) 
+- setDate(date) *Shortcut for `board.setHeader('Date', date)`*
+- setPlayer(color, name) *Shortcut for `board.setHeader('White|Black', name)`*
+- getPgnText() *Retrieves current game in PGN format*
 
 ---
 
