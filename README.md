@@ -89,6 +89,76 @@ Codes for figurines in ```utf8``` and ```html```. Reserved for future use.
 
 ---
 
+```js
+    static partPosition = (pos) => ChessBoard.partition([...pos]).map(r => r.join('')).join('/')
+    static compressPosition = (pos) => ChessBoard.partPosition(pos).replace(/0+/g, (m => m.length.toString()))
+    static expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => ChessBoard.range(0, parseInt(d)).map(i => '0').join(''))
+    
+    static sqBgLabels = ['Blue', 'Brown', 'Acqua', 'Maroon']
+    static lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf', '#FFF2D7']
+    static darkSqBgs = ['#6495ed', '#b58863', '#56b6e2', "#B2535B"]
+    static selectedSqBg = '#bfd'
+
+    static emptyPosition = ChessBoard.range(0, 64).map(i =>'0').join('')
+    static defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
+    static sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
+      
+    static emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
+    static defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    static sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
+    
+    static pgnTagLineRE = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
+    static sanRE = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/
+    
+    static defaultSettings = {
+      size: 400,
+      flipped: false,
+      chessSet: 'default',
+      currentPosition: 0,
+      positions: [ChessBoard.defaultFen],
+      lightSqsBg: ChessBoard.lightSqBgs[0],
+      darkSqsBg: ChessBoard.darkSqBgs[0],
+      selectedSqBg: ChessBoard.selectedSqBg,
+      movements:  [],
+      isCrowning: false,
+      showNotation: true,
+      whitePlayer: 'White Player',
+      blackPlayer: 'Black Player',
+      lang: 'en'
+    }
+```
+
+All of the above should be pretty self explanatory
+
+---
+#### Instance methods
+
+To be invoked to perform a particular action on a selected instance, for example, to flip the board: 
+
+```js
+import {Component} from 'react'
+import ChessBoard from 'next-chess-board'
+
+export default class BoardPage extend Component { 
+   render () {
+     return (
+        <div>
+            <ChessBoard ref="board1" size={400} moveValidator={true} />
+            <button onClick={(evt) => this.refs.board1.flip()}
+        </div>
+    )
+  }
+}
+```
+
+#### List of available instance methods
+
+- flip() *Flips/Unflips the board*
+- setSize(newSize) *Sets board size to **newsize***
+
+
+---
+
 > Work in progress. To be continued. 
 
 ---
