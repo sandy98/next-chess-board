@@ -35,6 +35,7 @@ You are ready to use ChessBoard component in your react.js project, for instance
 ---
 ## Usage
 >Fine tuning of the component.
+
 >Yet to be written.
 
 ---
