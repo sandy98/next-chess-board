@@ -84,18 +84,18 @@ export default class BoardPage2 extends Component {
       }
     })
     this.unsCheck = this.refs.board1.on(
-      ChessBoard.Events.CHECK, (data) => this.setState({isNotify: true, notifyMsg: data, notifyLen: 5000})) 
+      ChessBoard.Events.CHECK, (message, san) => this.setState({isNotify: true, notifyMsg: `${san} ${message[this.state.lang]}`, notifyLen: 5000})) 
     this.unsCheckMate = this.refs.board1.on(
-      ChessBoard.Events.CHECK_MATE, (data) => {
+      ChessBoard.Events.CHECK_MATE, (message, san, result) => {
         this.stockfish.postMessage('stop')
-        this.setState({isPondering: false, isNotify: true, notifyMsg: data, notifyLen: 60000})
+        this.setState({isPondering: false, isNotify: true, notifyMsg: `${san} ${message[this.state.lang]} ${result}`, notifyLen: 60000})
       }) 
     this.unsStaleMate = this.refs.board1.on(
-      ChessBoard.Events.STALE_MATE, (data) => this.setState({isNotify: true, notifyMsg: data, notifyLen: 60000})) 
+      ChessBoard.Events.STALE_MATE, (message, result) => this.setState({isNotify: true, notifyMsg: `${message[this.state.lang]} ${result}`, notifyLen: 60000})) 
     this.unsInsufficient = this.refs.board1.on(
-      ChessBoard.Events.INSUFFICIENT_MATERIAL, (data) => this.setState({isNotify: true, notifyMsg: data, notifyLen: 60000})) 
+      ChessBoard.Events.INSUFFICIENT_MATERIAL, (message, result) => this.setState({isNotify: true, notifyMsg: `${message[this.state.lang]} ${result}`, notifyLen: 60000})) 
     this.unsError = this.refs.board1.on(
-      ChessBoard.Events.ERROR, (data) => this.setState({isNotify: true, notifyMsg: data, notifyLen: 5000})) 
+      ChessBoard.Events.ERROR, (message, data) => this.setState({isNotify: true, notifyMsg: `${message[this.state.lang]} ${data}`, notifyLen: 5000})) 
     this.setState({flipped: this.refs.board1.state.flipped || false})
     this.refs.board1.setSize(parseInt(screen.availWidth / 3.4))
     //Warning! Delete next line in production!
@@ -276,7 +276,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.3.7</h6>                               
+            <h6 className="title">React Chess Board v0.3.8</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 

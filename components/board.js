@@ -2,92 +2,94 @@ import {v4} from 'uuid'
 import {Component} from 'react'
 import Chess from 'chess.js'
 
-/* General functions */
-
-const range = (b = 0, e = b + 8, r = []) => 
-b === e ? r : range(b < e ? b + 1 : b - 1, e, [...r, b])
-
-const compose = (...fns) => (arg) => fns.reduce((a, f) => f(a), arg)
-
-const partition = (arr, n = 8, r = []) => 
-arr.length > 0 ? partition(arr.slice(n), n, [...r, arr.slice(0, n)]) : r
-
-/* End of general functions */
-
-/*
-const unflippedRows = [range(56), range(48), range(40), range(32), range(24), range(16), range(8), range()]
-const flippedRows = [range(7, -1), range(15, 7), range(23, 15), range(31, 23), 
-                     range(39, 31), range(47, 39), range(55, 47), range(63, 55)]
-*/
-
-  
-
 
 const steimberg = 155978933
 
-const partPosition = (pos) => partition([...pos]).map(r => r.join('')).join('/')
-const compressPosition = (pos) => partPosition(pos).replace(/0+/g, (m => m.length.toString()))
-const expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => range(0, parseInt(d)).map(i => '0').join(''))
-
-const sqBgLabels = ['Blue', 'Brown', 'Acqua', 'Maroon']
-const lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf', '#FFF2D7']
-const darkSqBgs = ['#6495ed', '#b58863', '#56b6e2', "#B2535B"]
-const selectedSqBg = '#bfd'
-
-const emptyPosition = range(0, 64).map(i =>'0').join('')
-const defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
-const sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
-  
-const emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
-const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
-
-const pgnTagLineRE = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
-const sanRE = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/
-
-const defaultSettings = {
-  size: 400,
-  flipped: false,
-  chessSet: 'default',
-  currentPosition: 0,
-  positions: [defaultFen],
-  lightSqsBg: lightSqBgs[0],
-  darkSqsBg: darkSqBgs[0],
-  selectedSqBg: selectedSqBg,
-  movements:  [],
-  isCrowning: false,
-  showNotation: true,
-  whitePlayer: 'White Player',
-  blackPlayer: 'Black Player',
-  lang: 'en'
-}
-
-//
-
-const row = sq => parseInt(sq / 8)
-const col = sq => sq % 8
-const difCol = (sq1, sq2) => Math.abs(col(sq1) - col(sq2))
-const difRow = (sq1, sq2) => Math.abs(row(sq1) - row(sq2))
-const isSameCol = (sq1, sq2) => difCol(sq1, sq2) === 0
-const isSameRow = (sq1, sq2) => difRow(sq1, sq2) === 0
-const isDiagonal = (sq1, sq2) => (sq1 != sq2) && (difRow(sq1, sq2) === difCol(sq1, sq2))
-const isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
-const isBlackSquare = (sq) => ((row(sq) % 2 === 0) && (col(sq) % 2 === 0)) || ((row(sq) % 2 === 1) && (col(sq) % 2 === 1))
-const sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + col(sq))}${row(sq) + 1}` : '-'
-const san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
-const figureColor = (figure) => figure ? figure === figure.toLowerCase() ? 'b' : 'w' : '-'
-const date2pgn = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-
-const letter2img = {p: 'p.png', P: 'pw.png', 
-                     n: 'n.png', N: 'nw.png', 
-                     b: 'b.png', B: 'bw.png', 
-                     r: 'r.png', R: 'rw.png',
-                     q: 'q.png', Q: 'qw.png',
-                     k: 'k.png', K: 'kw.png'}
-
 export default class ChessBoard extends Component {
     
-    static version = '0.3.7'
+    static version = '0.3.8'
+
+    /* General functions */
+
+    static range = (b = 0, e = b + 8, r = []) => 
+    b === e ? r : ChessBoard.range(b < e ? b + 1 : b - 1, e, [...r, b])
+
+    static compose = (...fns) => (arg) => fns.reduce((a, f) => f(a), arg)
+
+    static partition = (arr, n = 8, r = []) => 
+      arr.length > 0 ? ChessBoard.partition(arr.slice(n), n, [...r, arr.slice(0, n)]) : r
+
+    /* End of general functions */
+
+    /*
+    const unflippedRows = [ChessBoard.range(56), ChessBoard.range(48), ChessBoard.range(40), ChessBoard.range(32), ChessBoard.range(24), ChessBoard.range(16), ChessBoard.range(8), ChessBoard.range()]
+    const flippedRows = [ChessBoard.range(7, -1), ChessBoard.range(15, 7), ChessBoard.range(23, 15), ChessBoard.range(31, 23), 
+                        ChessBoard.range(39, 31), ChessBoard.range(47, 39), ChessBoard.range(55, 47), ChessBoard.range(63, 55)]
+    */    
+
+    static partPosition = (pos) => ChessBoard.partition([...pos]).map(r => r.join('')).join('/')
+    static compressPosition = (pos) => ChessBoard.partPosition(pos).replace(/0+/g, (m => m.length.toString()))
+    static expandPosition = (pos) => pos.replace(/\//g, '').replace(/[1-8]/g, (d) => ChessBoard.range(0, parseInt(d)).map(i => '0').join(''))
+    
+    static sqBgLabels = ['Blue', 'Brown', 'Acqua', 'Maroon']
+    static lightSqBgs = ['#add8e6', '#f0d9b5', '#dfdfdf', '#FFF2D7']
+    static darkSqBgs = ['#6495ed', '#b58863', '#56b6e2', "#B2535B"]
+    static selectedSqBg = '#bfd'
+
+    static emptyPosition = ChessBoard.range(0, 64).map(i =>'0').join('')
+    static defaultPosition = 'rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR'
+    static sicilianPosition = 'rnbqkbnrpp0ppppp0000000000p000000000P00000000000PPPP0PPPRNBQKBNR'
+      
+    static emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
+    static defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    static sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
+    
+    static pgnTagLineRE = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
+    static sanRE = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/
+    
+    static defaultSettings = {
+      size: 400,
+      flipped: false,
+      chessSet: 'default',
+      currentPosition: 0,
+      positions: [ChessBoard.defaultFen],
+      lightSqsBg: ChessBoard.lightSqBgs[0],
+      darkSqsBg: ChessBoard.darkSqBgs[0],
+      selectedSqBg: ChessBoard.selectedSqBg,
+      movements:  [],
+      isCrowning: false,
+      showNotation: true,
+      whitePlayer: 'White Player',
+      blackPlayer: 'Black Player',
+      lang: 'en'
+    }
+    
+
+    static row = sq => parseInt(sq / 8)
+    static col = sq => sq % 8
+    static difCol = (sq1, sq2) => Math.abs(ChessBoard.col(sq1) - ChessBoard.col(sq2))
+    static difRow = (sq1, sq2) => Math.abs(ChessBoard.row(sq1) - ChessBoard.row(sq2))
+    static isSameCol = (sq1, sq2) => difCol(sq1, sq2) === 0
+    static isSameRow = (sq1, sq2) => difRow(sq1, sq2) === 0
+    static isDiagonal = (sq1, sq2) => (sq1 != sq2) && (difRow(sq1, sq2) === difCol(sq1, sq2))
+    static isAntiDiagonal = (sq1, sq2) => isDiagonal(sq1, sq2) && (Math.abs(sq1 - sq2) % 7) === 0 
+    static isBlackSquare = (sq) => ((ChessBoard.row(sq) % 2 === 0) && (ChessBoard.col(sq) % 2 === 0)) || ((ChessBoard.row(sq) % 2 === 1) && (ChessBoard.col(sq) % 2 === 1))
+    static sq2san = (sq) => sq >= 0 && sq < 64 ? `${String.fromCharCode(97 + ChessBoard.col(sq))}${ChessBoard.row(sq) + 1}` : '-'
+    static san2sq = (san) => (san.charCodeAt(0) - 97) + (parseInt(san[1]) - 1) * 8
+    static figureColor = (figure) => figure ? figure === figure.toLowerCase() ? 'b' : 'w' : '-'
+    static date2pgn = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+    
+    static letter2img = {p: 'p.png', P: 'pw.png', 
+                         n: 'n.png', N: 'nw.png', 
+                         b: 'b.png', B: 'bw.png', 
+                         r: 'r.png', R: 'rw.png',
+                         q: 'q.png', Q: 'qw.png',
+                         k: 'k.png', K: 'kw.png'}
+    
+    
+    //
+    
+        
 
     static chessSets = {
       alt1: {
@@ -197,7 +199,8 @@ export default class ChessBoard extends Component {
         }
       }
 
-    static Events = {
+    
+      static Events = {
       CHECK_MATE: "CHECK_MATE",
       CHECK: "CHECK",
       DRAW: "DRAW",
@@ -212,8 +215,15 @@ export default class ChessBoard extends Component {
     static Messages = {
       CHECK_MATE: {en: 'Checkmate', es: 'Jaque Mate'},
       CHECK: {en: 'Check', es: 'Jaque'},
-      STALE_MATE: {en: 'Stalemate', es: 'Mate ahogado'},
-      INSUFFICIENT_MATERIAL: {en: 'Insufficient material', es: 'Material insuficiente'}
+      STALE_MATE: {en: 'Stalemate draw', es: 'Tablas por mate ahogado'},
+      INSUFFICIENT_MATERIAL: {en: 'Draw for insufficient material', es: 'Tablas por material insuficiente'},
+      WRONG_MOVE: {en: 'Wrong move', es: 'Movimiento incorrecto'},
+      ERROR_LOAD_FEN: {en: "Could not load position", es: "No se pudo cargar la posición"},
+      ERROR_PREV_POS: {en: "Attempt to move from a non last position", es: "Intento de mover desde una posición que no es la última"},
+      ERROR_MOVE_ARGS: {en: "Move called with wrong number of arguments", es: "Función 'move' invocada con número incorrecto de argumentos"},
+      ERROR_MOVE_TURN: {en: "Attempt to move the wrong color", es: "Intento de mover el color equivocadd"},
+      ERROR_CANT_PROCESS_SAN: {en: "Can't process standard algebraic notation (SAN) move without a move validator", es: "No se puede procesar movimiento en notación algebraica estandard (SAN) sin un validador de movimientos"},
+      ERROR_WRONG_MOVE: {en: 'Wrong move', es: 'Movida errónea'}
     }
 
     static Figurines = {
@@ -260,15 +270,15 @@ export default class ChessBoard extends Component {
         }
       }
 
-      console.log(arr)
+      // console.log(arr)
 
       for (let i = 0; i < 64; i++) {
         if (arr[i] !== '0') {
           img = new Image()
           img.src = ChessBoard.chessSets[this.state.chessSet][arr[i]]
           let ci = this.state.flipped ? i ^ 63  ^ 56 : i ^ 56
-          yy = row(ci ^ 56) * sqSize
-          xx = col(ci ^ 56) * sqSize
+          yy = ChessBoard.row(ci ^ 56) * sqSize
+          xx = ChessBoard.col(ci ^ 56) * sqSize
           context.drawImage(img, xx, yy, sqSize, sqSize)
         }
       }
@@ -282,27 +292,27 @@ export default class ChessBoard extends Component {
       return () => this.subscribers = this.subscribers.filter((subscriber) => subscriber.id !== uuid) 
     }
 
-    emit = (evt, data) =>  this.subscribers.filter((subscriber) => subscriber.event === evt).forEach(
-      (subscriber) => subscriber.callback(data)  
+    emit = (evt, ...data) =>  this.subscribers.filter((subscriber) => subscriber.event === evt).forEach(
+      (subscriber) => subscriber.callback(...data)  
     )
         
     constructor(props) {
       super(props)
       this.subscribers = []
       this.state = {
-        size: this.props.size || defaultSettings.size,
-        flipped: this.props.flipped || defaultSettings.flipped,
-        chessSet: this.props.chessSet || defaultSettings.chessSet,
-        currentPosition: this.props.currentPosition || defaultSettings.currentPosition,
-        positions: this.props.positions || defaultSettings.positions,
-        movements: this.props.movements || defaultSettings.movements,
-        lightSqsBg: this.props.lightSqsBg || defaultSettings.lightSqsBg,
-        darkSqsBg: this.props.darkSqsBg || defaultSettings.darkSqsBg,
-        selectedSqBg: this.props.selectedSqBg || defaultSettings.selectedSqBg,
-        showNotation: this.props.showNotation || defaultSettings.showNotation,
-        whitePlayer: this.props.whitePlayer || defaultSettings.whitePlayer,
-        blackPlayer: this.props.blackPlayer || defaultSettings.blackPlayer,
-        gameDate: date2pgn(new Date()),
+        size: this.props.size || ChessBoard.defaultSettings.size,
+        flipped: this.props.flipped || ChessBoard.defaultSettings.flipped,
+        chessSet: this.props.chessSet || ChessBoard.defaultSettings.chessSet,
+        currentPosition: this.props.currentPosition || ChessBoard.defaultSettings.currentPosition,
+        positions: this.props.positions || ChessBoard.defaultSettings.positions,
+        movements: this.props.movements || ChessBoard.defaultSettings.movements,
+        lightSqsBg: this.props.lightSqsBg || ChessBoard.defaultSettings.lightSqsBg,
+        darkSqsBg: this.props.darkSqsBg || ChessBoard.defaultSettings.darkSqsBg,
+        selectedSqBg: this.props.selectedSqBg || ChessBoard.defaultSettings.selectedSqBg,
+        showNotation: this.props.showNotation || ChessBoard.defaultSettings.showNotation,
+        whitePlayer: this.props.whitePlayer || ChessBoard.defaultSettings.whitePlayer,
+        blackPlayer: this.props.blackPlayer || ChessBoard.defaultSettings.blackPlayer,
+        gameDate: ChessBoard.date2pgn(new Date()),
         selectedSq: -1,
         isDragging: false,
         isCrowning: false,
@@ -316,7 +326,7 @@ export default class ChessBoard extends Component {
 
     useSet = (set) => this.setState({chessSet: set})
 
-    useSquares = (n) => this.setState({lightSqsBg: lightSqBgs[n], darkSqsBg: darkSqBgs[n]})
+    useSquares = (n) => this.setState({lightSqsBg: ChessBoard.lightSqBgs[n], darkSqsBg: darkSqBgs[n]})
 
 
     goto = (n) => {
@@ -335,16 +345,16 @@ export default class ChessBoard extends Component {
 
     empty = () => {
       if (this.props.moveValidator) {
-        this.game.load(emptyFen)
+        this.game.load(ChessBoard.emptyFen)
       }
-      this.setState({positions: [emptyFen],
+      this.setState({positions: [ChessBoard.emptyFen],
         currentPosition: 0, movements: []})
     }
 
     resetBaseHeaders = () => {
-      this.setState({whitePlayer: this.props.whitePlayer || defaultSettings.whitePlayer,
-                     blackPlayer: this.props.blackPlayer || defaultSettings.blackPlayer,
-                    gameDate: date2pgn(new Date())})
+      this.setState({whitePlayer: this.props.whitePlayer || ChessBoard.defaultSettings.whitePlayer,
+                     blackPlayer: this.props.blackPlayer || ChessBoard.defaultSettings.blackPlayer,
+                    gameDate: ChessBoard.date2pgn(new Date())})
     }
 
     setBaseHeaders = () => {
@@ -360,7 +370,7 @@ export default class ChessBoard extends Component {
         this.game.reset()
         this.setBaseHeaders()
       } 
-      this.setState({positions: [defaultFen],
+      this.setState({positions: [ChessBoard.defaultFen],
                      currentPosition: 0, movements: []})
       this.emit(ChessBoard.Events.CHANGE, 0)
       return true
@@ -378,7 +388,7 @@ export default class ChessBoard extends Component {
         this.emit(ChessBoard.Events.CHANGE, 0)
       }
       else {
-        this.emit(ChessBoard.Events.ERROR, "Could not load FEN.")
+        this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_LOAD_FEN, '')
       }
         
       return result
@@ -422,13 +432,13 @@ export default class ChessBoard extends Component {
       return csan.replace(/[NBRQKnbrqk]/, (l) => ChessBoard.Figurines[l].html)
     }
 
-    static getAvailSqColors = () => {return {light: lightSqBgs, dark: darkSqBgs, labels: sqBgLabels}}
+    static getAvailSqColors = () => {return {light: ChessBoard.lightSqBgs, dark: ChessBoard.darkSqBgs, labels: ChessBoard.sqBgLabels}}
 
     isFlipped = () => this.state.flipped
 
     paramFromPosition = (npos, nparam) => this.state.positions[npos].split(/\s+/)[nparam]
 
-    figuresFromPosition = (npos) => expandPosition(this.state.positions[npos].split(/\s+/)[0])
+    figuresFromPosition = (npos) => ChessBoard.expandPosition(this.state.positions[npos].split(/\s+/)[0])
     whoMovesFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[1]
     castlingFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[2]
     enPassantFromPosition = (npos) => this.state.positions[npos].split(/\s+/)[3]
@@ -453,7 +463,7 @@ export default class ChessBoard extends Component {
     }
 
     setDate = (date) => {
-      this.setState({gameDate: date2pgn(date)})
+      this.setState({gameDate: ChessBoard.date2pgn(date)})
       this.setBaseHeaders()
     }
 
@@ -533,33 +543,34 @@ export default class ChessBoard extends Component {
         this.crowningInfo = {sqFrom: sqFrom,
                              sqTo: sqTo,
                              figureFrom: fig,
-                             sqColor: isBlackSquare(sqTo ^ 56) ? 'b' : 'w',
-                             figColor: figureColor(fig),
-                             top: this.refs[sq2san(sqTo ^ 56)].offsetTop,
-                             left: this.refs[sq2san(sqTo ^ 56)].offsetLeft,
+                             sqColor: ChessBoard.isBlackSquare(sqTo ^ 56) ? 'b' : 'w',
+                             figColor: ChessBoard.figureColor(fig),
+                             top: this.refs[ChessBoard.sq2san(sqTo ^ 56)].offsetTop,
+                             left: this.refs[ChessBoard.sq2san(sqTo ^ 56)].offsetLeft,
                             }
         this.setState({isCrowning: true})
     }
 
     move = (...args) => {
       if (this.state.currentPosition !== this.state.positions.length - 1)  {
-        return this.emit(ChessBoard.Events.ERROR, `attempt to move from a previous position`)
+        return this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_PREV_POS, '')
       }
       let argsLen = args.length
       if (argsLen === 0 || argsLen === 2) {
-        return this.emit(ChessBoard.Events.ERROR, `move called with wrong number of arguments: ${argsLen}`)
+        return this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_MOVE_ARGS, argsLen)
       }
       let [sqFrom, sqTo, figure, crowning ] = args
-      if (argsLen > 1 && this.whoMovesCurrent() !== figureColor(figure))   {
-        return this.emit(ChessBoard.Events.ERROR, `attempt to move with the wrong turn`)
+      if (argsLen > 1 && this.whoMovesCurrent() !== ChessBoard.figureColor(figure))   {
+        return this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_MOVE_TURN, ChessBoard.figureColor(figure))
       }
-      if (!crowning && ((figure === 'p' && row(sqTo ^ 56) === 0) || (figure === 'P' && row(sqTo ^ 56) === 7))) {
+      if (!crowning && ((figure === 'p' && ChessBoard.row(sqTo ^ 56) === 0) || (figure === 'P' && ChessBoard.row(sqTo ^ 56) === 7))) {
           this.getCrowning(sqFrom, sqTo, figure)
           return
       }
       if (argsLen === 1 && !this.props.moveValidator) {
-        return this.emit(ChessBoard.Events.ERROR, "can't process san move without a move validator")
+        return this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_CANT_PROCESS_SAN, '')
       }
+
       if (!this.props.moveValidator && argsLen > 1) {
           let oldFigure
           if (crowning) {[oldFigure, figure] = [figure, crowning]}
@@ -603,7 +614,7 @@ export default class ChessBoard extends Component {
       let newEnPassant = '-'
       if ((figure === 'p' || figure === 'P') && Math.abs(sqTo - sqFrom) === 16) {
         let sumando = figure === 'P' ? 8 : -8
-        newEnPassant = sq2san((sqTo + sumando) ^ 56)
+        newEnPassant = ChessBoard.sq2san((sqTo + sumando) ^ 56)
       }
 
       let newHalfMoveClock = this.halfMoveClockCurrent() + 1
@@ -624,12 +635,12 @@ export default class ChessBoard extends Component {
           params = args[0]
         }
         else {
-          params = {from: sq2san(sqFrom ^ 56), to: sq2san(sqTo ^ 56)}
+          params = {from: ChessBoard.sq2san(sqFrom ^ 56), to: ChessBoard.sq2san(sqTo ^ 56)}
           params = crowning ? {...params, promotion: crowning.toLowerCase()} : params
         }
         let move = this.game.move(params)
         if (!move) {
-          return this.emit(ChessBoard.Events.ERROR, 'wrong move')
+          return this.emit(ChessBoard.Events.ERROR, ChessBoard.Messages.ERROR_WRONG_MOVE, '')
         }
         else {
           let newCurrentPos = this.game.fens().length -1
@@ -646,7 +657,7 @@ export default class ChessBoard extends Component {
           this.emit(ChessBoard.Events.MOVE, san) 
 
           if (this.game.in_check() && !this.game.in_checkmate()) {
-              this.emit(ChessBoard.Events.CHECK, `${moveNumber}${dots} ${san}`)              
+              this.emit(ChessBoard.Events.CHECK, ChessBoard.Messages.CHECK , `${moveNumber}${dots} ${san}`)              
           }
 
           if (this.game.game_over()) {
@@ -654,17 +665,17 @@ export default class ChessBoard extends Component {
               let [result, dottedMoveNumber] = this.game.turn() === 'b' ? ['1-0', `${moveNumber}.`] : ['0-1', `${moveNumber}. ...`]
               this.game.header('Result', result)
               this.setState({gameResult: result})
-              this.emit(ChessBoard.Events.CHECK_MATE, `${dottedMoveNumber}${san} checkmate. ${result}`)
+              this.emit(ChessBoard.Events.CHECK_MATE, ChessBoard.Messages.CHECK_MATE, `${dottedMoveNumber}${san}`, result)
             }
             else if (this.game.in_draw()) {
               if (this.game.insufficient_material() || this.game.in_stalemate()) {
                 this.game.header('Result', '1/2-1/2')
                 this.setState({gameResult: '1/2-1/2'})
                 if (this.game.in_stalemate()) {
-                  this.emit(ChessBoard.Events.STALE_MATE, `Draw 1/2-1/2 stalemate`)
+                  this.emit(ChessBoard.Events.STALE_MATE, ChessBoard.Messages.STALE_MATE, `1/2-1/2`)
                 }
                 else {
-                  this.emit(ChessBoard.Events.INSUFFICIENT_MATERIAL, `Draw 1/2-1/2 insufficient material`)
+                  this.emit(ChessBoard.Events.INSUFFICIENT_MATERIAL, ChessBoard.Messages.INSUFFICIENT_MATERIAL,`1/2-1/2`)
                 }
               }
             }
@@ -675,7 +686,7 @@ export default class ChessBoard extends Component {
 
     onSquareClick = (sq, figure, evt) => {
       evt.preventDefault()
-      if (this.whoMovesCurrent() !== figureColor(figure) && this.sqFrom === -1) {
+      if (this.whoMovesCurrent() !== ChessBoard.figureColor(figure) && this.sqFrom === -1) {
         //this.sqFrom = -1
         //this.figureFrom = -1
         //this.setState({selectedSq: -1})
@@ -689,7 +700,7 @@ export default class ChessBoard extends Component {
           this.sqFrom = sq
           this.figureFrom = figure
           this.setState({selectedSq: sq, isDragging: false})
-          //console.log(`Selected square class name: ${this.refs[sq2san(sq ^ 56)].className}`)
+          //console.log(`Selected square class name: ${this.refs[ChessBoard.sq2san(sq ^ 56)].className}`)
         }
       }
       else {
@@ -730,8 +741,8 @@ export default class ChessBoard extends Component {
 
     onSquareDrop = (sq, evt) => {
       evt.preventDefault()
-      //console.log(`onSquareDrop(sq=${sq}, san=${sq2san(sq ^ 56)})`)
-      if (sq === this.sqFrom || this.whoMovesCurrent() != figureColor(this.figureFrom)) {
+      //console.log(`onSquareDrop(sq=${sq}, san=${ChessBoard.sq2san(sq ^ 56)})`)
+      if (sq === this.sqFrom || this.whoMovesCurrent() != ChessBoard.figureColor(this.figureFrom)) {
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
@@ -745,12 +756,12 @@ export default class ChessBoard extends Component {
 
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
-      // console.log(`Selected square = ${sq2san(this.state.selectedSq ^ 56)}`)
+      // console.log(`Selected square = ${ChessBoard.sq2san(this.state.selectedSq ^ 56)}`)
       let imgSize = ChessBoard.chessSets[this.state.chessSet].size
-      let figures = expandPosition(this.state.positions[this.state.currentPosition].split(/\s+/)[0])
+      let figures = ChessBoard.expandPosition(this.state.positions[this.state.currentPosition].split(/\s+/)[0])
       let chosenRows = this.state.flipped ? 
-                         range(7, -1).map(n => range(n * 8 + 7, n * 8 - 1 )) : 
-                         range().map(n => range(n * 8, n * 8 + 8))
+                         ChessBoard.range(7, -1).map(n => ChessBoard.range(n * 8 + 7, n * 8 - 1 )) : 
+                         ChessBoard.range().map(n => ChessBoard.range(n * 8, n * 8 + 8))
       let rows = chosenRows.map((row, nrow) => {
           let rowIndex = this.state.flipped ? nrow : 7 - nrow
           return (<div key={rowIndex} ref={`row_${rowIndex}`} style={{height: `${this.state.size / 8}px`, 
@@ -760,7 +771,7 @@ export default class ChessBoard extends Component {
                                               opacity: this.state.isCrowning ? '0.5' : '1'}}>
               {row.map(
                 (sq, index) => {
-                  let san = sq2san(sq ^ 56)
+                  let san = ChessBoard.sq2san(sq ^ 56)
                   let figure = figures[sq]
                   let content, imgsrc
                   if (figure === '0') {
@@ -771,13 +782,13 @@ export default class ChessBoard extends Component {
                     content = (
                         <img
                           src={ChessBoard.chessSets[this.state.chessSet][figure]}
-                          draggable={figureColor(figure) === this.whoMovesCurrent() ? true : false}
+                          draggable={ChessBoard.figureColor(figure) === this.whoMovesCurrent() ? true : false}
                           figure={figure}
-                          color={figureColor(figure)}
+                          color={ChessBoard.figureColor(figure)}
                           style={{
                             width: `${imgSize}%`,
                             height: `${imgSize}%`,
-                            cursor: figureColor(figure) === this.whoMovesCurrent() ? "pointer" : "not-allowed",
+                            cursor: ChessBoard.figureColor(figure) === this.whoMovesCurrent() ? "pointer" : "not-allowed",
                             opacity: this.state.isDragging && this.state.selectedSq === sq ? "0" : "1",
                           }}
                           onDragStart={evt => this.onFigureDragStart(sq, figure, evt)}
@@ -798,10 +809,10 @@ export default class ChessBoard extends Component {
                                  textAlign: 'center',
                                  paddingTop: imgSize === 100 ? 0 : `${(100 - imgSize) / 10}%`,
                                  backgroundColor: sq === this.state.selectedSq ? this.state.selectedSqBg :
-                                                  isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
+                                                  ChessBoard.isBlackSquare(sq ^ 56) ? this.state.darkSqsBg : this.state.lightSqsBg}}
                          ref={san}
                          tooltip={san}
-                         color={isBlackSquare(sq ^ 56) ? 'b' : 'w'}
+                         color={ChessBoard.isBlackSquare(sq ^ 56) ? 'b' : 'w'}
                     >
                       {content}  
                     </div>
