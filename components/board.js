@@ -1,13 +1,20 @@
 import {v4} from 'uuid'
 import {Component} from 'react'
 import Chess from 'chess.js'
-
+import chess_sets from './chess-sets'
 
 const steimberg = 155978933
 
 export default class ChessBoard extends Component {
     
-    static version = '0.4.1'
+    static version = '0.4.2'
+
+    static Modes = {
+      MODE_SETUP: 'MODE_SETUP',
+      MODE_ANALYSIS: 'MODE_ANALYSIS',
+      MODE_VIEW: 'MODE_VIEW',
+      MODE_PLAY: 'MODE_PLAY'
+    }
 
     /* General functions */
 
@@ -61,7 +68,9 @@ export default class ChessBoard extends Component {
       showNotation: true,
       whitePlayer: 'White Player',
       blackPlayer: 'Black Player',
-      lang: 'en'
+      lang: 'en',
+      mode: ChessBoard.Modes.MODE_ANALYSIS,
+      hideNotation: false
     }
     
 
@@ -86,9 +95,6 @@ export default class ChessBoard extends Component {
                          q: 'q.png', Q: 'qw.png',
                          k: 'k.png', K: 'kw.png'}
     
-    //
-            
-
     static chessSets = {
       alt1: {
         size: 95,  
@@ -165,7 +171,7 @@ export default class ChessBoard extends Component {
         r: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAtCAYAAAAz8ULgAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAABEAAAARABBMRn7QAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAUzSURBVFiF7VldbBRVFP7uPbPTlm6LC22JVJTZUjCIVQyQRmu0hhAhabENRBB9EEkQo9GIoDFBNPGFQIUKPmBMHwRbUKMg1iiaQCImYCSxhmhRu1MgBAOF/tBddtrduT7MzO7M7Oy0xi2hSb9kds7c87Pf3HvP3LlnmBACqhpZBaAN3qhVlPBxL4WqRp4A8GUWPzsaFCV8KEuMRwEcy+K3WlHCByTr6uzZPwfXP78haLf49OCBaFlZqe+/nzt3PvrKptcLOScQSeDEQSSl5He3vhm9Y/p03xh9/QPRd7Y3F9rbXt2wbnBG+e0AgBTJRGJY7+npcTgLoQvf6AASyaS4dq0XnMgkRyDJIklIJkeOoQsh+geuO9qSyaRuyXykALcCxgVJyU+p6zrFYrEPOzp+HXRqGMAAORCYLHSd/GIIXSdN05rOnDnzFpjN3yJAPDhSDF+SW7ZsLSgsLKxMheYc3DwYETjniEZjfiHw0cetBZOLi8OGj+Vv+FqIxzXfGL4kT5465bi2JweXzCQhCSRlD/N751lPH06+nedNsry8vKD1k/2+xowZPwzMODPYZGbOAku27ABm6cGcMXxQMjVU4CYpAKa3trXhxo3sw8dsQ8U5gVP6mrnaiJPRRpQxRSxdNuTlyVjduFw3eAHMXHHy4vH4watXry1Z+9y6gosXL3o6+w13tuekJY92uEumTsHml9bfKA4Gj8py4ElFCWscABQlrOXn5zeUlZXu/fyzg9q8eff4DsVYQblzBt7e/LJ2W3HRXlkONChKWAPMnrSjq+vvFxOJRNPG1zbJx44dd+jGsifvv3cuNjz79BBx2lhRUbHH8b/uu6momLVHluWV7zXt0NaseWrEJS0XWPzIQ+KFtc9oAUla6SYIePSkBVWNLBoaGvqhf2CgKDpoe5YzMy9t51TWepxhfwKk7GFmO1CQn4dJkyZdD0jSYkUJ/+zFJStJAOjs/KPt0KHDq746csQwNrOWk5W1xkGSka2Gzjjs2U0kGRlO9ieCMdwPLnoANdULD8yunL06Gw/fh7kQQly6dAkdHb8BGJs5OacyDOHXUxgnLxgTJHOFCZK5wgTJXGGCZK4wQTJX8F27OefBuro6VFXdByC9V0ntYayDM3Nvw4321LUpp3y4MwaAaaUl4IwF/Xj4vardlUgk/mppaQmcv3DBMLb2MSxze2rf7jrayLBP73EYOCfjhgCUlUzB0sWPDRPxSkUJn/tPPRmPx7d9d/So/v7uD9I9O0Zv5qFQSF84v2obgFVeXDznpKpGqoiosbl5d162m8glvjjybR5nvFFVI1Veek+SsVhs1759+/nly5fHlp2J3v5+fH/8R65p2i4vfcZwd3ertZJENWp3Ny1b+rhD51Vmydh3c556+3bu0117cNe++58rV4gTr+nuVmtnzlQcRdUMksPDwyt6e/sC9fV1GXeUrk64qxIeGe+uXjja09ltx+BgLFBcRCvgqvxmkBRC6F+3t2PnzuaMIGNdHFhRvwxLah/WM/43w/IWxATJXIFFIl1v2BuEEMt/OX26+sSJnzKNGXdkJ2PMlAmMs/TKwrmxKtlXotS16cMy+2fe3Dm4e1b4JIDDbpKivf2bobimmUQYppVNk70qa8Y6bK6/Fkmb7NZZMk+1O23cKJkSQm9f35C1UMuBAKoXzJclANi+o0l2fx7xws0o/QGQLWFycRGqF8wfH3NSAoBQKDQqY2MlsXrFqgtJIMmsCXl8EeOSBOISyJQNOxpVzbwoaHwkY5FI100p7/0f/AtqgngTt18VQwAAAABJRU5ErkJggg==", 
         R: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAtCAYAAAAz8ULgAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAABEAAAARABBMRn7QAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAUzSURBVFiF7VlrbBRVFP529tGdbsujLXTdtexaRBENBiH+ERNJpBgpkVYeJf7QUCWg+EMeAko0kV+ojSQ2IIQgEUwRqGgwvokSEn5IeBkfURQWmi27xRYWu5bZMuf4Yx57Z3d2imFLbNIvTefOueee+e7j3HvPWRczIxoONgFogz1mxOKJ7+0qouHgXAAHCrQT0RCLJz4pYOMRAN8VaLcoFk/s8Rhv90y6t/eDD9vKRI36x+rSyWTC8et3jL8zve39XQGVCESASgRiAhFDJcKKZc3pC7FzjjYqKqvSb23ZGRBlG9a91Bv78wwAwCTp9XpozNixlsaSJLGjdQAet5srq8Zo5HRiYtnt9gxowyVJPKqi0iJzuz1k8hjIwP8BQ4Kkx6lSckvuQCCw7f5JE3s1SXbmGIAsl46UJMntaEOS3H6/3HLfxLtey0qzdvyyXDaQDUeSb7a8I6d7eycY70SsOwVATGBmlJWPdDKBF1a8LKdSqVpmBhGBGCAisLBS5dJSRxuOJB+a/rDlXVWtTkFEUEn7eCFMnjLV1LG2HdCf8kl2dHTIc+sfd1TWes/Zp/YAmzKA9QLrDUQd/c8sO6Er0SnnkmQw6JnFzSh1GHpjupkAlQlMDGKGZSr1PVKTafXEDCYyy0Z9IVzr68OOzZvI6KtLP3FKZFn+qLKqqq5tb7tcM26cbWOn6S60TxbSKTTdXYlOvL5qeV/q8uWvFeXawlg8oUgAEIsnlL6+voauZHLr7FkzldOnTjnPxSDhj99+xaqlTys93X9tVZRrDbF4QgH0kRRRWxNa7vV6W1rf2+abWTfLUjeYI3ns6BG0bFifUdXrK892dLaKdXmb+dmOzlZFUeY/v+RZZeeO7TfugjeBzw/s47ffeFXp78/MzyUI2IykgWg4+GCJz/ftiFGjysvLy0251Xu1f1kPzhYMq6InGx5vlgH8k04jffXq3/3X+x+NxRM/2HEpSBIA7q6NtC1oWtTUOG8+AJhTx8za0/BYc5PXvFclzfNVttPJ7gAAcPibL3Doy8/2nDl3YVEhHo6bucvl4lAojCkPTAUwOGvy59Mn4HK5HJfVkLhgDJMsFoZJFgvDJIuFYZLFwjDJYsHx7GZGWXv7Ppw4cVx/Z0ucY8Q2bMYyOXLjRqTXmzcozsZEF+MdYEaZzedNOF3VIh6P58yy5S96I5EoAJi3HDbjFC2uMWIcNmIcZrAQ9opxTTbm0b6bvBjHx227+lX1+oRYPHH+P42k3y9vnD1nDq1cvcaUDdbN/FJXko4ePrQRQJMdF9s1GQ0HJ6uq2rh67bqSQp0oJp5avLSEiBqj4eBku3pbkoFAYFPzc0ukYPC2wWWno6JqDOobF0p+Wd5kV5833ZFQ9Qy/3z+9dvx498FPrXlPMe7Orj1hnQmxNou3cYZ5Q2e2j7vDNRG3qtL0SKh6xvnOpCWpmkfS6/PNG11R4W3fvzevR7mebYYvdt6rqQrZDWuWw85dy0eO8KYu0zzkZH7zSLoAamh8EmteWZ9nZLCTA7u3b8bB/XvyEktDYjMfJlkseKLh4FpRIEnStJPHj2NL67t5yoZXsuDN2iljJxe83DgaSZTnk/n9l59ApE7L5eSKhKr5iYbGjN/v14kQkomk7/aamjwjLBDTPFQoG4SRo2M5z0V5PslLyYsYXVmZkSRtgjOZDI4c+srnioSq+djJH5H784gdbkXqT8SVnm40L6gfImsSALp7um9IWTVyQeIo6fmeQr+IEWXzP8YI0g2OZCp1BYC+Jm+ik7cE/wKfjx1PbiTAVgAAAABJRU5ErkJggg==", 
       },
-      spatial: {
+      /* spatial: {
         size: 80,
         b: "data:image/png;base64,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", 
         B: "data:image/png;base64,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", 
@@ -178,8 +184,9 @@ export default class ChessBoard extends Component {
         q: "data:image/png;base64,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", 
         Q: "data:image/png;base64,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", 
         r: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAtCAYAAAAz8ULgAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA5QAAAOUBj+WbPAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAARoSURBVFiFxZhNbNxEGIbfb+zEdhKyDaA0iK5KiJQWiFDSE6RSL6hHVCTEqRJHDghVXHpL4lrsjXslLlyjSsAJCY7VigOEa8WfEII0QFGabLdbku2uPcNh1+uxPf5bO2UkK/vF45ln3ne+mdGQEAL/V3EcZ45z/gdj7KmkOp7H/9afJJSi1DzP02/d+gqMMRAxEBGIGBhj0DQdV65cek53HOc9AC/maHDXtu2bJ0HKuQAgQCSGkIOYsYHLOoBPms0mOOcgIgAEIgz/0uh/Fy++LhzH+dS27W61iAPl5P7k2IdEs9mE67ojmaOyEzGsr7/G/Y/84jjOAoDzOUh2bNs+SsSUxIiCjiCTKwaxqnS7vc97vd6q6/ZdWZlBe4PfpmkYpml8DGAzHZKF+g36H0KqK7FY5Xjh07dvfzN19+6fw/qDbwI3GFZXX8aFCytWEqAskNp2gPmjl8FUcXpRq588uLTv5flIAWQSWDhOUiHdAV+NVMSYzSw0SD2rUlpHRPTg8uVLx67LvagyAMAYoOv6hBDiYTpk1OZwLuiBGiKxYpKShmG8BeCFTKmAH9Ih1fMxMXGSbAegua77z+amnKRp0yAcb21tqaoxAFZysrIA0jTN4WI+GI2cnX62CiGwvf3FrL/ox7OZIt9T6D0QAPjtT02ZWF9/NdG9kZL9fv/3a9c+OJMgiM45BwB0Oo/Qbj8cNaIaSNF4AA+lzSHIRqOxmGTZxsbG/vb2Z8+2Wu3ITlTNEyz8cZtj2Z1e0vfWsjFjDAsLTw+nSRhQ06Q5mYpYIVh0Wev1+rh/v42VlUUYxmQLwG64b6Df934tAFmNvXLsecDOzo9YWnoe587Vv2w0PnpXxZCxHahPJtXF6QeYnJCq3SDbxqJx1tkgB2S25Wk7VTRb1XFpyGptVSuazpB9RIGq0fKxamcpqWRe28aLs0oBJfPNv3EVTkMppOR4NqpiFopLJY6f2dXbrAIfEzKsZLWJU2l2F7Ft3LiidbKIbeM8JZUsk7151Syt5EnaLKtfClJl80k8pSHHtTF/nF4KZvfJgGbNySd6Mo8+pjmB+flZnDplgTF6yXGcD6Wuv7Zt+6fCkFWrWa8/g1rNwtFRD/v7j9YAeoWIYFm6ZlkTbwB4MwfkydpMBBwc/Iu9vTaISCNiFmMM8/MzOHu2pvkUY6yTeZ+8px/1NY9cRko6jlMH8Lb8kjGylpbqePy4H2owUAOhhqO/Ve88j+PevU4EKA6uhOScXz88bL/farU9qeFJw5iEYRjSiP1G/DrytAjioHM5Bk6fnkWn00O360baCQ9GCQmAdnf/0u7c+UXz72zCF0/Jl/5F4rm56QzF42rGEifPFpYdJ18jahoTa2tnjgHiRGTs7bUn4vVTIA1jEjMz09J8iyo62CLl2H8vDyh69SffphHRsa5r7wD4TQixwRhd1bTo7VvYchny++XlxYPl5UWEB5K9bUW8iHwfKw8AfGvb9uGNG8539Xrtar1ei1XyPPGz//s/s1PvmLrJam8AAAAASUVORK5CYII=", 
-        R: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAtCAYAAAAz8ULgAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA5QAAAOUBj+WbPAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAViSURBVFiFxVhdaBxVFP7u7PzsZjdJ0xZUmmqSttpY8QdFLYqgLaINQkGEilB8iQWx0j74lIqgYBVDWkSFhqIP4ktF++APtkjJQy3agkXQasGKDdXU2jS7STa7yezc48POzL0zc2d2spvU+7Ds2Tv3nu983znn7lxGRPi/BmOsyzCMi7Ztt8c9k7XMCf16glKMzlzW0i/8OAYiAhEHOAcRBxFhfmEe/Zu33aQzxl4A0Jdiw3Ei+mA5kJqmAbjAiDiI87rNHQCADuDQ0NAQdF0HiEAggACAQET+b2/uf5sYYx8SUXXJURIJJj2fng2AAaBKpQLLsiJ0y3a+c5VTq9UKMkjG2I0ANqaAcZqI5sI/MsZ6OtoL586f+Tan8lutVrH+gSeh1wMhEYHEYMBWjK6uFZ+1Fwp35/P5mku/y4z/gauT16xSsfQOgFcTmfT9cmG7e+iCbi7AIWqrBmMsf3B4f9vWRx9x88hbx0G87vDA+6N4a+S9XBLNSpl934BWj9ljzqM7aCOGSS9AEZi0Fu7amAAjTPr1QEHbAxlLt7Qg1hlJ4MBDNjXESEDQLwVxAAjlZIQNiXqVA07FwZf2VizTdNTugZnZssGIppNYDFYzhQL1czJJ5vjCmSoWtwPoSeYKAHAuaVIps8cmAkyqZfbnwDLZbPafXE7UQDab9RlLQAAAyGWzkSnLNDUAOZXMclfRAaBUKqFiGv5DXp+Sq1XTNJwaO95hmYZ0KoguIK/1VfB6H3hdRb8X1tf+ffkKBvfsU8gcrG69ra3tz1t613XH8KBnMhkwBqztXoO+npuhaZoAw70.4.1B3AUvNW1OHIyhYXXr5XK5N06pQqHw78kTx1ZvWN8HcfoopImt7nCuq2SNS7dQdSemlNxoQQo7DCDYmCMySjaIw7ZrGPvutJT7blqAYNt2OpCq00fVtCPdwAfKQzKKvVZ1rcDm++7EGyOHcHVyagrAuOwXADo7Cr+nYDJBqqZkFoFkLROjw6/h8Cef48Dox19OT8/uVGHQGhMZJ3P8edtI5qjsyW2sAUhyA48/jeLSIDAXZ0OsbQEkGsgcPsIayB6bBskQGoIkNCezWvaYNFgaJpP/azYtswe2VZCRDVUV27TMXgolY1i+6k7M31B1ww20eZBIJXOkiauaeoLsrTO5VDKHA/ODSSQyRU4uo8ziX3+rTKaSWcwvVmbRhpoFSTHVrXzhSpJZ/Xoi7GSaUhVO6zI3sFvukzGyLoXM16m6W5W5MYspmUyu7riX+jT5G37hap7JxcqseqVIkLluJ48U/8yxbDJPXJnEsbHvceanXzG/YPczxvZIrr8hot9SgYyTmZZA5o+OfIWzP5/Hht5ubHvswXs0sE0EwsVLlzMXxie2AHgqHZNQy9y4uhXVHpKZc44tD92LwR0DIOIZEOWIcxw9fhLDhz/NeBgWV90RmVuU3c1GkgPzSRHDZ5IxthbA0/KkaRi5I0e/wOqVK0PMuRx7MkuOvN9VQREIHfk2bH/8YXcOoWfUN3g+SMPQX7mj/7YXN2281SF3A84dc6pYwlSxJIB5m3uAXLbrIIRT2ZYD+/rEKdx1+zr0rrlBzClPIxWTYGzgia2Zl3c9nxHXKd7lEncvm9ykl78v4l6IiOOHs7+AuOOu9/DJbYpHyAwWTqAIwtUcOiUWXd11e65SpR27X69kNI3PL9jWrmcHDOXaOJDFUgnjl/4S1ci5DyB4Qri2d2sGjy0I5gJBCjYdh1emZ8rPAPhD1zP7ao7zXHV+wX+eOIdtBy+OGbncmqax0zLNETergoMiX1IOin5lrFieq9xPRNd0Xd/tOM67qpWFfO7gzOzcXgD4D6zBK1ls0WbZAAAAAElFTkSuQmCC", 
-        },
+        R: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAtCAYAAAAz8ULgAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA5QAAAOUBj+WbPAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAViSURBVFiFxVhdaBxVFP7u7PzsZjdJ0xZUmmqSttpY8QdFLYqgLaINQkGEilB8iQWx0j74lIqgYBVDWkSFhqIP4ktF++APtkjJQy3agkXQasGKDdXU2jS7STa7yezc48POzL0zc2d2spvU+7Ds2Tv3nu983znn7lxGRPi/BmOsyzCMi7Ztt8c9k7XMCf16glKMzlzW0i/8OAYiAhEHOAcRBxFhfmEe/Zu33aQzxl4A0Jdiw3Ei+mA5kJqmAbjAiDiI87rNHQCADuDQ0NAQdF0HiEAggACAQET+b2/uf5sYYx8SUXXJURIJJj2fng2AAaBKpQLLsiJ0y3a+c5VTq9UKMkjG2I0ANqaAcZqI5sI/MsZ6OtoL586f+Tan8lutVrH+gSeh1wMhEYHEYMBWjK6uFZ+1Fwp35/P5mku/y4z/gauT16xSsfQOgFcTmfT9cmG7e+iCbi7AIWqrBmMsf3B4f9vWRx9x88hbx0G87vDA+6N4a+S9XBLNSpl934BWj9ljzqM7aCOGSS9AEZi0Fu7amAAjTPr1QEHbAxlLt7Qg1hlJ4MBDNjXESEDQLwVxAAjlZIQNiXqVA07FwZf2VizTdNTugZnZssGIppNYDFYzhQL1czJJ5vjCmSoWtwPoSeYKAHAuaVIps8cmAkyqZfbnwDLZbPafXE7UQDab9RlLQAAAyGWzkSnLNDUAOZXMclfRAaBUKqFiGv5DXp+Sq1XTNJwaO95hmYZ0KoguIK/1VfB6H3hdRb8X1tf+ffkKBvfsU8gcrG69ra3tz1t613XH8KBnMhkwBqztXoO+npuhaZoAw70.4.2B3AUvNW1OHIyhYXXr5XK5N06pQqHw78kTx1ZvWN8HcfoopImt7nCuq2SNS7dQdSemlNxoQQo7DCDYmCMySjaIw7ZrGPvutJT7blqAYNt2OpCq00fVtCPdwAfKQzKKvVZ1rcDm++7EGyOHcHVyagrAuOwXADo7Cr+nYDJBqqZkFoFkLROjw6/h8Cef48Dox19OT8/uVGHQGhMZJ3P8edtI5qjsyW2sAUhyA48/jeLSIDAXZ0OsbQEkGsgcPsIayB6bBskQGoIkNCezWvaYNFgaJpP/azYtswe2VZCRDVUV27TMXgolY1i+6k7M31B1ww20eZBIJXOkiauaeoLsrTO5VDKHA/ODSSQyRU4uo8ziX3+rTKaSWcwvVmbRhpoFSTHVrXzhSpJZ/Xoi7GSaUhVO6zI3sFvukzGyLoXM16m6W5W5MYspmUyu7riX+jT5G37hap7JxcqseqVIkLluJ48U/8yxbDJPXJnEsbHvceanXzG/YPczxvZIrr8hot9SgYyTmZZA5o+OfIWzP5/Hht5ubHvswXs0sE0EwsVLlzMXxie2AHgqHZNQy9y4uhXVHpKZc44tD92LwR0DIOIZEOWIcxw9fhLDhz/NeBgWV90RmVuU3c1GkgPzSRHDZ5IxthbA0/KkaRi5I0e/wOqVK0PMuRx7MkuOvN9VQREIHfk2bH/8YXcOoWfUN3g+SMPQX7mj/7YXN2281SF3A84dc6pYwlSxJIB5m3uAXLbrIIRT2ZYD+/rEKdx1+zr0rrlBzClPIxWTYGzgia2Zl3c9nxHXKd7lEncvm9ykl78v4l6IiOOHs7+AuOOu9/DJbYpHyAwWTqAIwtUcOiUWXd11e65SpR27X69kNI3PL9jWrmcHDOXaOJDFUgnjl/4S1ci5DyB4Qri2d2sGjy0I5gJBCjYdh1emZ8rPAPhD1zP7ao7zXHV+wX+eOIdtBy+OGbncmqax0zLNETergoMiX1IOin5lrFieq9xPRNd0Xd/tOM67qpWFfO7gzOzcXgD4D6zBK1ls0WbZAAAAAElFTkSuQmCC", 
+      }, */
+      spatial: chess_sets.spatial,
       veronika: {
         size: 80,
         b: "data:image/png;base64,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", 
@@ -301,6 +308,7 @@ export default class ChessBoard extends Component {
       super(props)
       this.subscribers = []
       this.state = {
+        mode: this.props.mode || ChessBoard.defaultSettings.mode,
         size: this.props.size || ChessBoard.defaultSettings.size,
         flipped: this.props.flipped || ChessBoard.defaultSettings.flipped,
         chessSet: this.props.chessSet || ChessBoard.defaultSettings.chessSet,
@@ -313,6 +321,7 @@ export default class ChessBoard extends Component {
         showNotation: this.props.showNotation || ChessBoard.defaultSettings.showNotation,
         whitePlayer: this.props.whitePlayer || ChessBoard.defaultSettings.whitePlayer,
         blackPlayer: this.props.blackPlayer || ChessBoard.defaultSettings.blackPlayer,
+        hideNotation: this.props.hideNotation || ChessBoard.defaultSettings.hideNotation,
         gameDate: ChessBoard.date2pgn(new Date()),
         selectedSq: -1,
         isDragging: false,
@@ -685,12 +694,13 @@ export default class ChessBoard extends Component {
 
     onSquareClick = (sq, figure, evt) => {
       evt.preventDefault()
-      if (this.whoMovesCurrent() !== ChessBoard.figureColor(figure) && this.sqFrom === -1) {
+      //if (this.whoMovesCurrent() !== ChessBoard.figureColor(figure) && this.sqFrom === -1) {
         //this.sqFrom = -1
         //this.figureFrom = -1
         //this.setState({selectedSq: -1})
-        return
-      }
+      //  return
+      //}
+
       if (this.sqFrom === -1) {
         if (figure === '0') {
           return
@@ -731,20 +741,35 @@ export default class ChessBoard extends Component {
 
       this.sqFrom = sq
       this.figureFrom = figure
+      console.log(this.sqFrom)
       this.setState({selectedSq: sq, isDragging: true})
     }
 
     onFigureDragEnd = (evt) => {
+        let newFen
+        //console.log("onFigureDragEnd")
+        if (this.state.selectedSq !== -1 && this.state.mode === ChessBoard.Modes.MODE_SETUP) {
+          newFen = this.putSquare(this.state.selectedSq, '0')
+          this.setState({positions: [newFen], selectedSq: -1})
+        }
         this.setState({isDragging: false})
     }
 
     onSquareDrop = (sq, evt) => {
       evt.preventDefault()
       //console.log(`onSquareDrop(sq=${sq}, san=${ChessBoard.sq2san(sq ^ 56)})`)
-      if (sq === this.sqFrom || this.whoMovesCurrent() != ChessBoard.figureColor(this.figureFrom)) {
+      if (sq === this.sqFrom || (this.state.mode !== ChessBoard.Modes.MODE_SETUP && this.whoMovesCurrent() != ChessBoard.figureColor(this.figureFrom))) {
           this.sqFrom = -1
           this.figureFrom = ''
           this.setState({selectedSq: -1})
+          return
+      }
+      if (this.state.mode === ChessBoard.Modes.MODE_SETUP) {
+          //console.log("onSquareDrop")
+          let newFen = this.putSquare(sq, this.figureFrom)
+          this.setState({positions: [newFen]})
+          this.sqFrom = -1
+          this.figureFrom = ''
           return
       }
       this.move(this.sqFrom, sq, this.figureFrom)
@@ -752,6 +777,23 @@ export default class ChessBoard extends Component {
       this.figureFrom = ''
       this.setState({selectedSq: -1})
     }
+
+    setup = () => this.setState({positions: [this.state.positions[this.state.currentPosition]], 
+                                 currentPosition: 0, 
+                                 mode: ChessBoard.Modes.MODE_SETUP})
+    analyze = () => this.setState({mode: ChessBoard.Modes.MODE_ANALIZE})
+    view = () => this.setState({mode: ChessBoard.Modes.MODE_VIEW})
+    play = () => this.setState({mode: ChessBoard.Modes.MODE_PLAY})
+    
+    putSquare = (sq, figure) => {
+      let [pos, turn, ep, castling, hmc, fmn] = this.state.positions[this.state.currentPosition].split(/\s+/)
+      let epos = ChessBoard.expandPosition(pos).split('')
+      epos[sq] = figure
+      let newpos = ChessBoard.compressPosition(epos.join(''))
+      return [newpos, turn, ep, castling, hmc, fmn].join(' ')
+    }
+
+    toggleNotation = () => this.setState({hideNotation: !this.state.hideNotation})
 
     render() {
       // console.log(`Rendering board (size ${this.state.size} pixels) id=${this.props.id || "No Id"}`)
@@ -781,7 +823,7 @@ export default class ChessBoard extends Component {
                     content = (
                         <img
                           src={ChessBoard.chessSets[this.state.chessSet][figure]}
-                          draggable={ChessBoard.figureColor(figure) === this.whoMovesCurrent() ? true : false}
+                          draggable={ChessBoard.figureColor(figure) === this.whoMovesCurrent() ? true : true}
                           figure={figure}
                           color={ChessBoard.figureColor(figure)}
                           style={{
@@ -886,7 +928,9 @@ export default class ChessBoard extends Component {
           <div
             ref="notation"
             style={{
-              display: this.props.hideNotation || !this.props.moveValidator ? 'none' : 'inherit',
+              display: this.state.hideNotation || 
+                       !this.props.moveValidator || 
+                       this.state.mode === ChessBoard.Modes.MODE_SETUP ? 'none' : 'inherit',
               border: 'solid 1px navy',
               borderTop: 'none',
               width: `${this.state.size}px`,
@@ -898,6 +942,229 @@ export default class ChessBoard extends Component {
             }}
           >
             {this.getPgnText()}
+          </div>
+          <div
+            ref="setup_panel"
+            style={{
+              display: this.state.mode !== ChessBoard.Modes.MODE_SETUP ? 'none' : 'inherit',
+              border: 'solid 1px navy',
+              borderTop: 'none',
+              width: `${this.state.size}px`,
+              height: `${parseInt(this.state.size / 3)}px`,
+              overflow: 'auto',
+              fontSize: '12pt',
+              backgroundColor: this.state.lightSqsBg
+            }}
+          >
+
+            <div style={{paddingLeft: '10px', paddingTop: '0'}}>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'p'}
+                >
+                  <img
+                    onDragStart={evt => this.onFigureDragStart(-1, 'p', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['p']} figure={'p'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'P'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'P', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['P']} figure={'P'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'n'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'n', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['n']} figure={'n'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'N'}
+                >
+                  <img 
+                  onDragStart={evt => this.onFigureDragStart(-1, 'N', evt)}
+                  onDragEnd={ev => this.onFigureDragEnd(ev)}
+                  src={ChessBoard.chessSets[this.state.chessSet]['N']} figure={'N'} draggable={true} 
+                  width={'100%'} height={'100%'}
+                />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'b'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'b', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['b']} figure={'b'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'B'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'B', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['B']} figure={'B'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px',
+                            marginLeft: '20px'
+                            }}
+                >
+                  <button onClick={() => this.empty()}>Empty</button>
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px',
+                            marginLeft: '20px'
+                            }}
+                >
+                  <button  onClick={() => this.reset()}>Initial</button>
+                </div>
+            </div>  
+
+            <div style={{paddingLeft: '10px', paddingTop: '0'}}>
+            <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'r'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'r', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['r']} figure={'r'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'R'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'R', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['R']} figure={'R'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'q'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'q', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['q']} figure={'q'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'Q'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'Q', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['Q']} figure={'Q'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'k'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'k', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['k']} figure={'k'} draggable={true} 
+                    width={'100%'} height={'100%'}
+                  />
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `${50}px`,
+                            width:  `${50}px`,
+                            border: 'solid 1 px'
+                            }}
+                    figure={'K'}
+                >
+                  <img 
+                    onDragStart={evt => this.onFigureDragStart(-1, 'K', evt)}
+                    onDragEnd={ev => this.onFigureDragEnd(ev)}
+                    src={ChessBoard.chessSets[this.state.chessSet]['K']} figure={'K'} draggable={true} 
+                    width={'100%'} height={'100%'}/>
+                </div>
+                <div style={{display: 'inline-block', 
+                            height: `50px`,
+                            width:   `50px`,
+                            border: 'solid 1 px',
+                            marginLeft: '20px'
+                            }}
+                >
+                  <button onClick={() => {
+                    this.loadFen(this.state.positions[0])
+                    this.analyze()
+                  }
+                  }>End</button>
+                </div>
+            </div>
+
+
+
+
+
           </div>
         </div>
       )

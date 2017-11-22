@@ -5,6 +5,7 @@ const links = [
   {href: '/borges', label: 'Jorge Luis Borges on Chess'},
   {href: '/sol', label: 'Fancy Sol Art'},
   {href: '/diagram', label: 'Draw diagrams'}, 
+  {href: '/boardsetup', label: 'Setup mode'},
   {href: '/about', label: 'About'},
   { href: 'https://github.com/sandy98/next-chess-board', label: 'Fork me at Github' }
 ].map(link => {

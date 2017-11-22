@@ -136,7 +136,7 @@ export default class BoardPage2 extends Component {
       this.setState({isPondering: false})
       let m2 = ev.data.match(/score\s+cp\s+(\-?\d+)\b/)
       let m3 = ev.data.match(/score\s+mate\s+(\-?\d+)\b/)
-      let engineScore = m2 ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '-' 
+      let engineScore = typeof m2 !== 'undefined' ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '-' 
       setTimeout(() => 
                    this.setState({isNotify: true, 
                                   notifyMsg: `${Messages.ENGINE_SUGGESTION_MSG[this.state.lang]}${m[2]}`, 
@@ -276,7 +276,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.4.1</h6>                               
+            <h6 className="title">React Chess Board v0.4.2</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
