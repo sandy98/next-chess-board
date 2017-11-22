@@ -61,6 +61,19 @@ The client pages, users of the component, may be found in the ```/pages``` direc
 Anyway the formal description follows.
 
 #### Static properties and methods
+
+```
+    static Modes = {
+      MODE_SETUP: 'MODE_SETUP',
+      MODE_ANALYSIS: 'MODE_ANALYSIS',
+      MODE_VIEW: 'MODE_VIEW',
+      MODE_PLAY: 'MODE_PLAY'
+    }
+```
+Define the 4 modes that ChessBoard can adopt.
+
+---
+
 ```Chessboard.chessSets``` Exposes an array of image sets in data format, which is used internally by the board to draw its images. This means that the user of the component doesn't have to care about figure images location, since they are embedded within the component itself. Exposing them publicly through this property allows their usage outside of the chessboard, for example:
 ```html
   <img src={ChessBoard.chessSets.alt1.B} title="White Bishop from alt1 set" />
@@ -173,7 +186,15 @@ export default class BoardPage extend Component {
 
 ##### List of available instance methods
 
-- flip() *Flips/Unflips the board*
+- setup() *Puts the board in setup mode, making the setup panel visible and hiding the notation panel*
+
+- analyse() *Puts the board in analyse mode, in which the user cand od basically anything that involves a legal chess move, including undoing*
+
+- view() *Puts the board in view mode, in which the user can browse the game, but isn't allowed to alter the game by any mean*
+
+- play() *Puts the board in game mode, which allows him to move when it's her/his turn*
+
+- flip() *Flips/Unflips the board. Shortcut: this function **can be invoked by double-clicking the board** in any mode*
 
 - setSize(newSize) *Sets board size to **newsize***
 
@@ -276,9 +297,8 @@ Looking at the way this is done in `/pages/index.js` of the demo project is stro
 ---
 
 > Todo: 
- - Implementing working modes: MODE_SETUP, MODE_ANALYSIS, MODE_VIEW, MODE_PLAY
 
- - Adding a panel for MODE_SETUP
+ - Embelishing
 
 ---
 
