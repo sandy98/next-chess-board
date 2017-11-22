@@ -151,7 +151,7 @@ export default class BoardPage extend Component {
 }
 ```
 
-#### List of available instance methods
+##### List of available instance methods
 
 - flip() *Flips/Unflips the board*
 
@@ -202,7 +202,63 @@ export default class BoardPage extend Component {
 
 ---
 
-> Work in progress. To be continued. 
+### Events
+
+The chessboard uses its own event system in order to communicate the components/pages that host it when something important has happened on the board, be it related to the game itself or otherwise.
+
+#### List of events that ChessBoard publishes
+
+- CHECK_MATE
+- CHECK
+- DRAW
+- STALE_MATE
+- INSUFFICIENT_MATERIAL
+- MOVE
+- ERROR
+- CHANGE
+- FLIP
+
+#### List of Messages associated to ChessBoard events
+
+- CHECK_MATE
+- CHECK
+- STALE_MATE
+- INSUFFICIENT_MATERIAL
+- WRONG_MOVE
+- ERROR_LOAD_FEN
+- ERROR_PREV_POS
+- ERROR_MOVE_ARGS
+- ERROR_MOVE_TURN
+- ERROR_CANT_PROCESS_SAN
+- ERROR_WRONG_MOVE
+
+Each one of the previous messages is an object which - as of now - contains two keys: **en** and **es**, each one of them containing the corresponding message in English and Spanish respectively. It would be nice to add italian, french, german, russian and portuguese to begin with, and to continue with other national languages. That's a task that will be undertaken in the near future, as long as we get some colabs who are up to the task.
+
+#### Usage of ChessBoard event system
+
+The clients (usually pages that host the board) shall subcribe to the events they're interested in, feeding ChessBoard with the desired event and a callback function that will be invoked when the event is fired/emitted by ChessBoard. In response ChessBoard will return a function that will cancel the subscription upon invocation. A typical scenario is subscriving to the event/s in `componentDidMount`, and unsubsribing in `componentWillUnmount`, like so:
+
+```js
+componentDidMount () {
+  this.unsubsCheckMate = board1.on(ChessBoard.Events.CHECK_MATE, 
+                                    (msg, move, result) => {
+                                      console.log(`${move}   ${msg[this.state.lang]} ${result}`})
+                                    })
+  }
+}
+componentWillUnmount () {
+  this.unsubscribeCheckMate() // Cleaning up before leaving
+}
+```
+
+Looking at the way this is done in `/pages/index.js` of the demo project is strongly encouraged.
+
+---
+
+> Todo: 
+ - Implementing working modes: MODE_SETUP, MODE_ANALYSIS, MODE_VIEW, MODE_PLAY
+
+ - Adding a panel for MODE_SETUP
 
 ---
 
