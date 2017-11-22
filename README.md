@@ -33,6 +33,24 @@ You are ready to use ChessBoard component in your react.js project, for instance
     )
 ```
 
+### Motivation
+
+In spite of the fact that there are many fine alternatives around, it's somewhat difficult to find one that offers a good mix of functionality and aesthetics. This work began with this idea in mind, and the result is a web chessboard that features:
+
+ 1. Seven chess figures set to choose from .
+ 
+ 2. Four differnet board backgrounds.
+ 
+ 3. Four different working modes: **setup**, **analysis**, **play** and **view**.
+ 
+ 4. A smart promotion panel that detects the promotion square and sits directly on it, sparing the player a long movement with the mouse to choose the promoting figure. It also detects color of the figures and background of the the square, "dressing" itself with those options, providing a clear visual clue of the action that's undergoing.
+ 
+ 5. Importing/exporting of FEN positions and PGN games.
+ 
+ 6. Exporting the board to image (as of now, PNG format), using the function `drawDiagram`
+ 
+7. Loads of other minor but useful features.
+
 ---
 ## API
 
