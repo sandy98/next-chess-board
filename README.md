@@ -144,7 +144,9 @@ export default class BoardPage extend Component {
      return (
         <div>
             <ChessBoard ref="board1" size={400} moveValidator={true} />
-            <button onClick={(evt) => this.refs.board1.flip()}
+            <button onClick={(evt) => this.refs.board1.flip()}>
+              Flip it!
+            </button>
         </div>
     )
   }
@@ -236,7 +238,7 @@ Each one of the previous messages is an object which - as of now - contains two 
 
 #### Usage of ChessBoard event system
 
-The clients (usually pages that host the board) shall subcribe to the events they're interested in, feeding ChessBoard with the desired event and a callback function that will be invoked when the event is fired/emitted by ChessBoard. In response ChessBoard will return a function that will cancel the subscription upon invocation. A typical scenario is subscriving to the event/s in `componentDidMount`, and unsubsribing in `componentWillUnmount`, like so:
+The clients (usually pages that host the board) shall subcribe to the events they're interested in, feeding ChessBoard with the desired event and a callback function that will be invoked when the event is fired/emitted by ChessBoard. In response ChessBoard will return a function that will cancel the subscription upon invocation. A typical scenario is subscribing to the event/s in `componentDidMount`, and unsubsribing in `componentWillUnmount`, like so:
 
 ```js
 componentDidMount () {
