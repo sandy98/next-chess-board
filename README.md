@@ -247,7 +247,7 @@ componentDidMount () {
   }
 }
 componentWillUnmount () {
-  this.unsubscribeCheckMate() // Cleaning up before leaving
+  this.unsubsCheckMate() // Cleaning up before leaving
 }
 ```
 
