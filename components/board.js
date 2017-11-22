@@ -7,7 +7,7 @@ const steimberg = 155978933
 
 export default class ChessBoard extends Component {
     
-    static version = '0.4.7'
+    static version = '0.4.8'
 
     static Modes = {
       MODE_SETUP: 'MODE_SETUP',
