@@ -1,5 +1,6 @@
 {
-  "version": "0.4.2",
+  "version": "0.4.5",
+  "description": "Yet another Javascript Chess Board", 
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
   "main": "lib/board.js",
@@ -16,7 +17,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "prepare": "next build && cp .next/dist/components/board.js lib/board.js"
+    "prepare": "next build && cp .next/dist/components/board.js lib/board.js && cp .next/dist/components/chess-sets.js lib/chess-sets.js"
   },
   "dependencies": {
     "chess.js": "https://github.com/sandy98/chess.js",

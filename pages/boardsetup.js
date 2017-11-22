@@ -19,8 +19,8 @@ export default () => {
             moveValidator={true} 
             mode={ChessBoard.Modes.MODE_SETUP}
             chessSet={'default'}
-            darkSqsBg={ChessBoard.darkSqBgs[1]}
-            lightSqsBg={ChessBoard.lightSqBgs[1]}
+            darkSqsBg={ChessBoard.darkSqBgs[2]}
+            lightSqsBg={ChessBoard.lightSqBgs[2]}
           />
           <button
             style={{fontSize: '16pt', height: '50px', maxHeight: '50px', marginTop: '10em'}} 
