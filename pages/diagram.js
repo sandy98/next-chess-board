@@ -30,15 +30,15 @@ export default () => {
                           display: 'inline-block', 
                           border: 'none'}}>
                 <div>
-                  <p>
+                  <div>
                     <ol>
                         <li>1 - Set the position on the board</li>
                         <li>2 - Click on "Draw Diagram" button</li>
                         <li>3 - Right click on the generated image</li>
                         <li>4 - Choose what you want to do with the image (copy, save) from the context menu</li>
                     </ol>
-                  </p>
-                  <p>
+                  </div>
+                  <div>
                     <canvas title="Right click to copy/save image" 
                             ref={(c) => canvas = c} id="diagram" 
                             width="400" 
@@ -47,7 +47,7 @@ export default () => {
                     >
                       <h4>Board Image</h4>
                     </canvas>
-                  </p>
+                  </div>
                 </div>
              </div>
              <div style={{marginTop: '30px'}}>

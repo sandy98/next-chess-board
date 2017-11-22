@@ -136,7 +136,7 @@ export default class BoardPage2 extends Component {
       this.setState({isPondering: false})
       let m2 = ev.data.match(/score\s+cp\s+(\-?\d+)\b/)
       let m3 = ev.data.match(/score\s+mate\s+(\-?\d+)\b/)
-      let engineScore = typeof m2 !== 'undefined' ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '-' 
+      let engineScore = m2 ? parseFloat(m2[1]) / 100 : m3 ? `M ${m3[1]}` : '-' 
       setTimeout(() => 
                    this.setState({isNotify: true, 
                                   notifyMsg: `${Messages.ENGINE_SUGGESTION_MSG[this.state.lang]}${m[2]}`, 
@@ -276,7 +276,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.4.5</h6>                               
+            <h6 className="title">React Chess Board v0.4.7</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
@@ -563,10 +563,16 @@ export default class BoardPage2 extends Component {
                                                           gridColumn: '5',
                                                           backgroundImage: this.state.isPondering ? 'url(/static/img/spinner.gif)' : 'none',
                                                           backgroundRepeat: 'no-repeat', backgroundPosition: 'center'}}> 
-                        {this.state.engineScore ? 
+                        {this.state.engineScore || this.state.engineScore === 0 ? 
                           this.state.engineScore.toFixed ? 
                             this.state.engineScore.toFixed(2) : this.state.engineScore : '-'}
                       </div>
+                  </div>
+                  <hr/>
+                  <div className="row">
+                    <button className="btn" onClick={() => this.refs.board1.setup()}>
+                      Setup
+                    </button>
                   </div>
                   </div>
                 </div>

@@ -1,9 +1,9 @@
 {
-  "version": "0.4.5",
+  "version": "0.4.7",
   "description": "Yet another Javascript Chess Board", 
   "author": "Domingo E. Savoretti",
   "name": "next-chess-board",
-  "main": "lib/board.js",
+  "main": "lib/board.min.js",
   "keywords": [
     "chess",
     "react",
@@ -17,7 +17,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "prepare": "next build && cp .next/dist/components/board.js lib/board.js && cp .next/dist/components/chess-sets.js lib/chess-sets.js"
+    "prepare": "next build && ./node_modules/.bin/uglifyjs .next/dist/components/board.js -c -m --comments 'license' > lib/board.min.js && ./node_modules/.bin/uglifyjs .next/dist/components/chess-sets.js -c -m --comments 'license' > lib/chess-sets.js"
   },
   "dependencies": {
     "chess.js": "https://github.com/sandy98/chess.js",

@@ -22,13 +22,20 @@ export default () => {
             darkSqsBg={ChessBoard.darkSqBgs[2]}
             lightSqsBg={ChessBoard.lightSqBgs[2]}
           />
-          <button
+          <span><button
             style={{fontSize: '16pt', height: '50px', maxHeight: '50px', marginTop: '10em'}} 
             disabled={!getSetupStatus() ? '' : 'disabled'}
             onClick={() => setTimeout(() => board1 ? board1.setup() : alert("Board not configured"), 0)}
           >
             Setup
-          </button>
+          </button></span>
+          <span><button
+            style={{fontSize: '16pt', height: '50px', maxHeight: '50px', marginTop: '10em'}} 
+            disabled={!getSetupStatus() ? '' : 'disabled'}
+            onClick={() => setTimeout(() => board1 ? board1.takeback() : alert("Board not configured"), 0)}
+          >
+            Undo
+          </button></span>
         </div>
       </div>
     </Nav>
