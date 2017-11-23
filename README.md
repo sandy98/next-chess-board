@@ -56,7 +56,7 @@ In spite of the fact that there are many fine alternatives around, it's somewhat
 ---
 ## API
 
-Main recomendation here is the old, wise *Look at the source, Luke* 
+Main recomendation here is the old, wise *Use the source, Luke* 
 
 The client pages, users of the component, may be found in the ```/pages``` directory of the source. There almost every feature this component provides is used, and the code is pretty self explanatory. Looking at them (and reusing code!) is strongly recommended.
 
