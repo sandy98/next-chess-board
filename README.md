@@ -97,7 +97,7 @@ static Messages = {
     }
 ```
 
-These are the messages that ChessBoard internally uses to provide feedback to its client page. As it shows, it's an array of objects, each one of them providing a string message in English and Spanish. It's up to the client page to choose the proper one according to its settings. Example of this can be seen in the message handliers implemented in ```index.js``` which provides for the home page at the demo site. It can be found under the ```/pages``` directory of the source. It's strongly recommended to have a thorough look at it, as it shows almost all the features depicted here. 
+These are the messages that ChessBoard internally uses to provide feedback to its client page. As it shows, it's an array of objects, each one of them providing a string message in English and Spanish (*would be good to have some more languages, contributors anywhere?*) . It's up to the client page to choose the proper one according to its settings. Example of this can be seen in the message handliers implemented in ```index.js``` which provides for the home page at the demo site. It can be found under the ```/pages``` directory of the source. It's strongly recommended to have a thorough look at it, as it shows almost all the features depicted here. 
 
 ---
 ```js
@@ -275,7 +275,7 @@ The chessboard uses its own event system in order to communicate the components/
 - ERROR_CANT_PROCESS_SAN
 - ERROR_WRONG_MOVE
 
-Each one of the previous messages is an object which - as of now - contains two keys: **en** and **es**, each one of them containing the corresponding message in English and Spanish respectively. It would be nice to add italian, french, german, russian and portuguese to begin with, and to continue with other national languages. That's a task that will be undertaken in the near future, as long as we get some colabs who are up to the task.
+Each one of the previous messages is an object which - as of now - contains two keys: **en** and **es**, each one of them containing the corresponding message in English and Spanish respectively. It would be nice to add italian, french, german, russian and portuguese to begin with, and to continue with other national languages. That's a task that will be undertaken in the near future, as long as we get some contributors who are up to the task.
 
 #### Usage of ChessBoard event system
 
