@@ -37,19 +37,21 @@ You are ready to use ChessBoard component in your react.js project, for instance
 
 In spite of the fact that there are many fine alternatives around, it's somewhat difficult to find one that offers a good mix of functionality and aesthetics. This work began with this idea in mind, and the result is a web chessboard that features:
 
- 1. Seven chess figures set to choose from .
+ 1. Performing moves through mouse clicks or mouse dragging of the figures. Most alternatives offer one way or the other, some of them let the user choose operating mode, and ... oh! there is also [ICC](https://www.chessclub.com/) web interface special case that not only uses dragging, but also pops up an annoying JQuery UI dialog **in the middle of your blitz game!** if you accidentally click twice on the board. All of this is solved by Next Chess Board. The user can click and/or drag and the component will behave consequently.
  
- 2. Four differnet board backgrounds.
+ 2. Seven chess figures set to choose from .
  
- 3. Four different working modes: **setup**, **analysis**, **play** and **view**.
+ 3. Four differnet board backgrounds.
  
- 4. A smart promotion panel that detects the promotion square and sits directly on it, sparing the player a long movement with the mouse to choose the promoting figure. It also detects color of the figures and background of the the square, "dressing" itself with those options, providing a clear visual clue of the action that's undergoing.
+ 4. Four different working modes: **setup**, **analysis**, **play** and **view**.
  
- 5. Importing/exporting of FEN positions and PGN games.
+ 5. A smart promotion panel that detects the promotion square and sits directly on it, sparing the player a long movement with the mouse to choose the promoting figure. It also detects color of the figures and background of the the square, "dressing" itself with those options, providing a clear visual clue of the action that's undergoing.
  
- 6. Exporting the board to image (as of now, PNG format), using the function `drawDiagram`
+ 6. Importing/exporting of FEN positions and PGN games.
  
-7. Loads of other minor but useful features.
+ 7. Exporting the board to image (as of now, PNG format), using the function `drawDiagram`
+ 
+8. Loads of other minor but useful features.
 
 ---
 ## API
