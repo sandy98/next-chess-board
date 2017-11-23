@@ -39,7 +39,7 @@ In spite of the fact that there are many fine alternatives around, it's somewhat
 
  1. Performing moves through mouse clicks or mouse dragging of the figures. Most alternatives offer one way or the other, some of them let the user choose operating mode, and ... oh! there is also [ICC](https://www.chessclub.com/) web interface special case that not only uses dragging, but also pops up an annoying JQuery UI dialog **in the middle of your blitz game!** if you accidentally click twice on the board. All of this is solved by Next Chess Board. The user can click and/or drag and the component will behave consequently.
  
- 2. Seven chess figures set to choose from .
+ 2. Seven chess figures sets to choose from .
  
  3. Four differnet board backgrounds.
  
