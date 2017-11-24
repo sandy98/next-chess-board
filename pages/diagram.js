@@ -30,7 +30,7 @@ export default () => {
                           display: 'inline-block', 
                           border: 'none'}}>
                 <div>
-                  <div>
+                  <div style={{position: 'relative', top: 0}}>
                     <ol>
                         <li>1 - Set the position on the board</li>
                         <li>2 - Click on "Draw Diagram" button</li>
@@ -49,7 +49,7 @@ export default () => {
                         <h4>Board Image</h4>
                       </canvas>
                     </span>
-                    <span style={{marginBottom: '15px', marginLeft: '2.5em'}}>
+                    <span style={{marginLeft: '2.5em'}}>
                       <fieldset style={{width: '6em', 
                                         display: 'inline-block', 
                                         position: 'relative',
