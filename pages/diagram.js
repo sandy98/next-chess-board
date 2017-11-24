@@ -9,14 +9,14 @@ export default () => {
 
     let sets = ['Alt1', 'Eyes', 'Fantasy', 'Modern', 'Spatial', 'Veronika']
     let sqBgs = ChessBoard.getAvailSqColors()
-    let board1, canvas
-    let drawDiagram = () => {
+    let board1, canvas, csize = 400
+    let drawDiagram = (cs) => {
       //alert("Draw!!")
       if (!canvas) {
           return false
       }
       let ctx = canvas.getContext('2d')
-      console.log(board1.drawDiagram(ctx, 400))
+      console.log(board1.drawDiagram(ctx, cs))
     }
 
     return (
@@ -39,14 +39,35 @@ export default () => {
                     </ol>
                   </div>
                   <div>
-                    <canvas title="Right click to copy/save image" 
-                            ref={(c) => canvas = c} id="diagram" 
-                            width="400" 
-                            height="400"
-                            style={{border: 'solid 1px blue'}}
-                    >
-                      <h4>Board Image</h4>
-                    </canvas>
+                    <span>
+                      <canvas title="Right click to copy/save image" 
+                              ref={(c) => canvas = c} id="diagram" 
+                              width={csize} 
+                              height={csize}
+                              style={{border: 'solid 1px blue'}}
+                      >
+                        <h4>Board Image</h4>
+                      </canvas>
+                    </span>
+                    <span style={{marginBottom: '15px', marginLeft: '2.5em'}}>
+                      <fieldset style={{width: '6em', 
+                                        display: 'inline-block', 
+                                        position: 'relative',
+                                        bottom: canvas ? canvas.bottom : 0}}
+                      >
+                        <legend>Image size&nbsp;</legend>
+                        <input 
+                          type="number" 
+                          defaultValue={400}
+                          onChange={(ev) => {
+                            csize = ev.target.value
+                            canvas.width = csize
+                            canvas.height = csize
+                          }} 
+                          style={{width: '3em', fontSize: '14pt'}}
+                        />
+                      </fieldset>
+                    </span>
                   </div>
                 </div>
              </div>
@@ -67,10 +88,10 @@ export default () => {
                   }
                 </select>
              
-                <button style={{fontSize: '16pt', marginLeft: '20px'}} onClick={drawDiagram}>Draw Diagram</button>
+                <button style={{fontSize: '16pt', marginLeft: '20px'}} onClick={() => drawDiagram(csize)}>Draw Diagram</button>
                 <button 
                   style={{fontSize: '16pt', marginLeft: '20px'}} 
-                  onClick={() => canvas.getContext('2d').clearRect(0,0, 400, 400)}
+                  onClick={() => canvas.getContext('2d').clearRect(0,0, csize, csize)}
                 >
                   Clear Diagram
                 </button>
