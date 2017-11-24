@@ -5,7 +5,7 @@ import chess_sets from './chess-sets'
 
 const steimberg = 155978933
 
-export default class ChessBoard extends Component {
+class ChessBoard extends Component {
     
     static version = '0.4.8'
 
@@ -54,26 +54,6 @@ export default class ChessBoard extends Component {
     static pgnTagLineRE = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
     static sanRE = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/
     
-    static defaultSettings = {
-      size: 400,
-      flipped: false,
-      chessSet: 'default',
-      currentPosition: 0,
-      positions: [ChessBoard.defaultFen],
-      lightSqsBg: ChessBoard.lightSqBgs[0],
-      darkSqsBg: ChessBoard.darkSqBgs[0],
-      selectedSqBg: ChessBoard.selectedSqBg,
-      movements:  [],
-      isCrowning: false,
-      showNotation: true,
-      whitePlayer: 'White Player',
-      blackPlayer: 'Black Player',
-      lang: 'en',
-      mode: ChessBoard.Modes.MODE_ANALYSIS,
-      hideNotation: false
-    }
-    
-
     static row = sq => parseInt(sq / 8)
     static col = sq => sq % 8
     static difCol = (sq1, sq2) => Math.abs(ChessBoard.col(sq1) - ChessBoard.col(sq2))
@@ -149,6 +129,52 @@ export default class ChessBoard extends Component {
 
     static getAvailSqColors = () => {return {light: ChessBoard.lightSqBgs, dark: ChessBoard.darkSqBgs, labels: ChessBoard.sqBgLabels}}
     
+  /*
+  size: 400,
+  flipped: false,
+  chessSet: 'default',
+  currentPosition: 0,
+  positions: [ChessBoard.defaultFen],
+  lightSqsBg: ChessBoard.lightSqBgs[0],
+  darkSqsBg: ChessBoard.darkSqBgs[0],
+  selectedSqBg: ChessBoard.selectedSqBg,
+  movements:  [],
+  isCrowning: false,
+  showNotation: true,
+  whitePlayer: 'White Player',
+  blackPlayer: 'Black Player',
+  lang: 'en',
+  mode: ChessBoard.Modes.MODE_ANALYSIS,
+  hideNotation: false
+  */
+
+    constructor(props) {
+      super(props)
+      this.subscribers = []
+      this.state = {
+        mode: props.mode,
+        size: props.size,
+        flipped: props.flipped,
+        chessSet: props.chessSet,
+        currentPosition: props.currentPosition,
+        positions: props.positions,
+        movements: props.movements,
+        lightSqsBg: props.lightSqsBg,
+        darkSqsBg: props.darkSqsBg,
+        selectedSqBg: props.selectedSqBg,
+        showNotation: props.showNotation,
+        whitePlayer: props.whitePlayer,
+        blackPlayer: props.blackPlayer,
+        hideNotation: props.hideNotation,
+        gameDate: ChessBoard.date2pgn(new Date()),
+        selectedSq: -1,
+        isDragging: false,
+        isCrowning: false,
+      }
+      this.sqFrom = -1
+      this.figureFrom = ''
+      this.moveValidator = props.moveValidator || null
+    }
 
     drawDiagram = (context, ctxSize = this.state.size) => {
       let x, y, xx, yy, img
@@ -204,41 +230,12 @@ export default class ChessBoard extends Component {
     emit = (evt, ...data) =>  this.subscribers.filter((subscriber) => subscriber.event === evt).forEach(
       (subscriber) => subscriber.callback(...data)  
     )
-        
-    constructor(props) {
-      super(props)
-      this.subscribers = []
-      this.state = {
-        mode: this.props.mode || ChessBoard.defaultSettings.mode,
-        size: this.props.size || ChessBoard.defaultSettings.size,
-        flipped: this.props.flipped || ChessBoard.defaultSettings.flipped,
-        chessSet: this.props.chessSet || ChessBoard.defaultSettings.chessSet,
-        currentPosition: this.props.currentPosition || ChessBoard.defaultSettings.currentPosition,
-        positions: this.props.positions || ChessBoard.defaultSettings.positions,
-        movements: this.props.movements || ChessBoard.defaultSettings.movements,
-        lightSqsBg: this.props.lightSqsBg || ChessBoard.defaultSettings.lightSqsBg,
-        darkSqsBg: this.props.darkSqsBg || ChessBoard.defaultSettings.darkSqsBg,
-        selectedSqBg: this.props.selectedSqBg || ChessBoard.defaultSettings.selectedSqBg,
-        showNotation: this.props.showNotation || ChessBoard.defaultSettings.showNotation,
-        whitePlayer: this.props.whitePlayer || ChessBoard.defaultSettings.whitePlayer,
-        blackPlayer: this.props.blackPlayer || ChessBoard.defaultSettings.blackPlayer,
-        hideNotation: this.props.hideNotation || ChessBoard.defaultSettings.hideNotation,
-        gameDate: ChessBoard.date2pgn(new Date()),
-        selectedSq: -1,
-        isDragging: false,
-        isCrowning: false,
-      }
-      this.sqFrom = -1
-      this.figureFrom = ''
-      this.moveValidator = props.moveValidator || null
-    }
 
     doScroll = () => this.refs.notation.scrollTop = this.refs.notation.scrollHeight
 
     useSet = (set) => this.setState({chessSet: set})
 
     useSquares = (n) => this.setState({lightSqsBg: ChessBoard.lightSqBgs[n], darkSqsBg: ChessBoard.darkSqBgs[n]})
-
 
     goto = (n) => {
       let n1
@@ -1067,3 +1064,25 @@ export default class ChessBoard extends Component {
       )
     }
 }
+
+
+ChessBoard.defaultProps = {
+  size: 400,
+  flipped: false,
+  chessSet: 'default',
+  currentPosition: 0,
+  positions: [ChessBoard.defaultFen],
+  lightSqsBg: ChessBoard.lightSqBgs[0],
+  darkSqsBg: ChessBoard.darkSqBgs[0],
+  selectedSqBg: ChessBoard.selectedSqBg,
+  movements:  [],
+  isCrowning: false,
+  showNotation: true,
+  whitePlayer: 'White Player',
+  blackPlayer: 'Black Player',
+  lang: 'en',
+  mode: ChessBoard.Modes.MODE_ANALYSIS,
+  hideNotation: false
+}
+
+export default ChessBoard
