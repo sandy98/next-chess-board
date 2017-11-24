@@ -272,6 +272,7 @@ export default class BoardPage2 extends Component {
               (e) => {
                 if (e.preventDefault) e.preventDefault()
                 if (e.cancelBubble) e.cancelBubble()
+                if (e.stopPropagation) e.stopPropagation()
                 return false
               }
             }
@@ -536,11 +537,13 @@ export default class BoardPage2 extends Component {
                              (e) => {
                                if (e.preventDefault) e.preventDefault()
                                if (e.cancelBubble) e.cancelBubble()
+                               if (e.stopPropagation) e.stopPropagation()
                                return false
                            }}
                            onDoubleClick={(ev) => {
                              if (ev.preventDefault) ev.preventDefault()
                              if (ev.cancelBubble) ev.cancelBubble()
+                             if (ev.stopPropagation) ev.stopPropagation()
                              let text = ev.target.innerText
                              if (text !== '-') return this.refs.board1.move(text)
                              return false
