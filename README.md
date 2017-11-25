@@ -1,4 +1,4 @@
-# React Chess Board v0.4.8
+# React Chess Board v0.4.9
 
 ![Old game](https://raw.githubusercontent.com/sandy98/next-chess-board/master/static/img/mangiaterra-savoretti-1988.png)
 

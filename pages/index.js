@@ -277,7 +277,7 @@ export default class BoardPage2 extends Component {
               }
             }
           >
-            <h6 className="title">React Chess Board v0.4.8</h6>                               
+            <h6 className="title">React Chess Board v0.4.9</h6>                               
             <div className="row">
                 <div>
                   <ChessBoard 
