@@ -148,6 +148,25 @@ class ChessBoard extends Component {
   hideNotation: false
   */
 
+    static defaultProps = {
+      size: 400,
+      flipped: false,
+      chessSet: 'default',
+      currentPosition: 0,
+      positions: [ChessBoard.defaultFen],
+      lightSqsBg: ChessBoard.lightSqBgs[0],
+      darkSqsBg: ChessBoard.darkSqBgs[0],
+      selectedSqBg: ChessBoard.selectedSqBg,
+      movements:  [],
+      isCrowning: false,
+      showNotation: true,
+      whitePlayer: 'White Player',
+      blackPlayer: 'Black Player',
+      lang: 'en',
+      mode: ChessBoard.Modes.MODE_ANALYSIS,
+      hideNotation: false
+    }
+
     constructor(props) {
       super(props)
       this.subscribers = []
@@ -1065,24 +1084,5 @@ class ChessBoard extends Component {
     }
 }
 
-
-ChessBoard.defaultProps = {
-  size: 400,
-  flipped: false,
-  chessSet: 'default',
-  currentPosition: 0,
-  positions: [ChessBoard.defaultFen],
-  lightSqsBg: ChessBoard.lightSqBgs[0],
-  darkSqsBg: ChessBoard.darkSqBgs[0],
-  selectedSqBg: ChessBoard.selectedSqBg,
-  movements:  [],
-  isCrowning: false,
-  showNotation: true,
-  whitePlayer: 'White Player',
-  blackPlayer: 'Black Player',
-  lang: 'en',
-  mode: ChessBoard.Modes.MODE_ANALYSIS,
-  hideNotation: false
-}
 
 export default ChessBoard
